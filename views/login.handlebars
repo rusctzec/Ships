@@ -1,30 +1,31 @@
 <div class="row">
     <div class="col">
-        <div class="card">
-            <div class="card-header">
-                <h2>TItle</h2>
+        <div class="nes-container with-title is-rounded">
+            <div class="title">
+                <h2>Title</h2>
             </div>
-            <div class="card-body">
+            <div>
                 <p>Description</p>
             </div>
-            <div class="card-footer">
-                <p>Made by Group Name</p>
+            <div>
+                <a href='https://github.com/DVasquez4155/Group-Project-2'><i class="nes-icon github"></i></a>
+                <span>Made by Group Name</span>
             </div>
         </div>
     </div>
     <div class="col-md-6 col-md-offset-3">
         <div class="card">
-            <form id='login' class='card-body'>
-                <div class="form-group">
+            <form id='login' class='card-body nes-container is-rounded'>
+                <div class="form-group nes-field">
                     <label for="email">Email address</label>
-                    <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Email">
+                    <input type="email" class="form-control nes-input" id="email" aria-describedby="emailHelp" placeholder="Email">
                 </div>
-                <div class="form-group">
+                <div class="form-group nes-field">
                     <label for="password">Password</label>
-                    <input type="password" class="form-control" id="password" placeholder="Password">
+                    <input type="password" class="form-control nes-input" id="password" placeholder="Password">
                     <span id='wrong' style="display: none;" class="hide error text-danger">Either you're note registered or the password is wrong!</span>
                 </div>
-                <button type="submit" class="btn btn-primary">Login</button>
+                <button type="submit" class="nes-btn is-primary">Login</button>
             </form>
         </div>
     </div>
