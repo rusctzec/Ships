@@ -1,5 +1,5 @@
-// const htmlCanvas = document.getElementById("health"),
-// armor = document.getElementById("armor");
+const htmlCanvas = document.getElementById("health"),
+armor = document.getElementById("armor");
 const maxHealth = 20,
 heart = "nes-icon heart",
 half = "is-half",
