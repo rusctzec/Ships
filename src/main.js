@@ -12,6 +12,7 @@ const INDEX = path.join(__dirname, '../dist/index.html');
 
 // define routes and socket
 const app = express();
+app.get('/', function(req, res) { res.render("game"); });
 app.use('/', express.static(path.join(__dirname, '../dist/')));
 let requestHandler = app.listen(PORT, () => console.log(`Listening on ${ PORT }`));
 const io = socketIO(requestHandler);
@@ -44,7 +45,7 @@ app.use(passport.session());
 
 
 // Static directory
-app.use(express.static("app/public"));
+app.use(express.static(__dirname + "/public"));
 app.use('/js', express.static(process.cwd() + '/node_modules/bootstrap/dist/js')); // redirect bootstrap JS
 app.use('/js', express.static(process.cwd() + '/node_modules/jquery/dist')); // redirect JS jQuery
 app.use('/css', express.static(process.cwd() + '/node_modules/bootstrap/dist/css')); // redirect CSS bootstrap
@@ -58,4 +59,4 @@ app.set("view engine", "handlebars");
 
 // Routes
 require("./routes/api.js")(app);
-// require("./routes/html.js")(app);
+require("./routes/html.js")(app);
