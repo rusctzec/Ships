@@ -5,6 +5,12 @@ module.exports = function (connection, Sequelize) {
     // Creates a "connection" model that matches up with DB
     const User = connection.define("user", {
         // The email cannot be null, and must be a proper email before creation
+        username: {
+            type: Sequelize.STRING,
+            allowNull: false,
+            unique: true
+        },
+        // The email cannot be null, and must be a proper email before creation
         email: {
             type: Sequelize.STRING,
             allowNull: false,

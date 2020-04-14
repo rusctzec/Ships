@@ -3,10 +3,10 @@ $(document).ready(function () {
     // and updates the HTML on the page
     $.get("/api/user_data").then(function (data) {
         console.log(data)
-        if(data.email == undefined) {
+        if(data.username == undefined) {
             return;
         }
-        $("#username").text(data.email);
+        $("#user").text(data.username);
         $("#links").hide();
         $("#userNav").show();
     });
