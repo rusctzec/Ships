@@ -9,7 +9,6 @@ module.exports = function (app) {
     app.post("/api/login", passport.authenticate("local"), function (req, res) {
         // Sending back a password, even a hashed password, isn't a good idea
         res.json({
-            username: req.body.username,
             email: req.user.email,
             id: req.user.id
         });
