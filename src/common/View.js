@@ -10,6 +10,7 @@ module.exports = {
     // health: document.getElementById("health"),
     // armor: document.getElementById("armor"),
     updateHealth(health) {
+        console.log(true)
         var healthBar = "";
         for (var i = 0; i < Math.floor((health)/2); i++) {
             healthBar += `<i class='${heart}'></i>`;
@@ -27,5 +28,3 @@ module.exports = {
         return armor;
     }
 }
-// Example
-// require("./View").updateArmor(20)

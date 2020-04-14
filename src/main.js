@@ -36,7 +36,7 @@ var passport = require("./config/passport");
 
 app.use(require('express-session')({
   //change secret
-  secret: 'keyboard cat',
+  secret: 'keyboardless cat',
   resave: true,
   saveUninitialized: true
 }));
