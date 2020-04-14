@@ -33,7 +33,7 @@ import session from 'express-session';
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-/* PASSPORT CONFIGURATION:
+/* PASSPORT CONFIGURATION: */
 var passport = require("./config/passport");
 
 app.use(require('express-session')({
@@ -44,10 +44,10 @@ app.use(require('express-session')({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-*/
+
 
 // Static directory
-app.use(express.static("app/public"));
+app.use(express.static(__dirname + "/public"));
 app.use('/js', express.static(process.cwd() + '/node_modules/bootstrap/dist/js')); // redirect bootstrap JS
 app.use('/js', express.static(process.cwd() + '/node_modules/jquery/dist')); // redirect JS jQuery
 app.use('/css', express.static(process.cwd() + '/node_modules/bootstrap/dist/css')); // redirect CSS bootstrap
@@ -60,11 +60,5 @@ app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 
 // Routes
-// require("./routes/api.js")(app);
-// require("./routes/html.js")(app);
-
-// Starts the server to begin listening
-//app.listen(PORT, function() {
-  // Log (server-side) when our server has started
-//    console.log("Server listening on: http://localhost:" + PORT);
-//});
+require("./routes/api.js")(app);
+require("./routes/html.js")(app);
