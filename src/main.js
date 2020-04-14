@@ -4,10 +4,9 @@
 import path from 'path';
 import express from 'express';
 import socketIO from 'socket.io';
-import { Lib, ServerEngine } from 'lance-gg';
-import Game from './common/Game';
+import { Lib } from 'lance-gg';
 
-var PORT = process.env.PORT || 8080;
+var PORT = process.env.PORT || 7070;
 const INDEX = path.join(__dirname, '../dist/index.html');
 
 // define routes and socket
@@ -18,8 +17,11 @@ let requestHandler = app.listen(PORT, () => console.log(`Listening on ${ PORT }`
 const io = socketIO(requestHandler);
 
 // Game Instances
-const gameEngine = new Game({ traceLevel: Lib.Trace.TRACE_NONE });
-const serverEngine = new ServerEngine(io, gameEngine, { debug: {}, updateRate: 6 });
+import ExServerEngine from './server/ExServerEngine.js';
+import ExGameEngine from './common/ExGameEngine.js';
+
+const gameEngine = new ExGameEngine({ traceLevel: Lib.Trace.TRACE_NONE });
+const serverEngine = new ExServerEngine(io, gameEngine, { debug: {}, updateRate: 6, timeoutInterval: 0 });
 
 // start the game
 serverEngine.start();
