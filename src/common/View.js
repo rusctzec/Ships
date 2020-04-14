@@ -27,5 +27,3 @@ module.exports = {
         return armor;
     }
 }
-// Example
-// require("./View").updateArmor(20)
