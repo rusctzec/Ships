@@ -5,9 +5,12 @@ let PixiParticles;
 export default class Ship extends DynamicObject {
     constructor(gameEngine, options, props) {
         super(gameEngine, options, props);
-        this.health = 5;
+        this.health = 6;
+        this.maxHealth = 6;
         this.friction = new TwoVector(0.98,0.98);
         this.fireRate = 2;
+        this.shield = 0;
+        this.maxShield = 20;
 
         if (props) this.username = props.username || "";
         if (typeof window != "undefined") {
@@ -29,8 +32,8 @@ export default class Ship extends DynamicObject {
             health: {type: BaseTypes.TYPES.INT8},
             maxHealth: {type: BaseTypes.TYPES.INT8},
             fireRate: {type: BaseTypes.TYPES.INT8},
-            shield: {type: BaseTypes.TYPES.INT8},
-            maxShield: {type: BaseTypes.TYPES.INT8},
+            shield: {type: BaseTypes.TYPES.INT16},
+            maxShield: {type: BaseTypes.TYPES.INT16},
         }, super.netScheme);
     }
 
@@ -51,12 +54,14 @@ export default class Ship extends DynamicObject {
             this.shipSprite.tint = 0xff0000;
             this.gameEngine.timer.add(3, () => {
                 if (this.gameEngine.isOwnedByPlayer(this)) {
-                    this.shipSprite.tint = 0x0000ff;
+                    this.shipSprite.tint = 0x4153AF;
                 } else {
-                    this.shipSprite.tint = 0x000000;
+                    this.shipSprite.tint = renderer.fgColor;
                 }
             }, this);
             if (this == renderer.playerShip) {
+                renderer.View.updateHealth(this.health, this.maxHealth);
+                renderer.View.updateArmor(this.shield, this.maxShield);
                 renderer.sounds.playerHurt.play();
                 renderer.cameraShake = 4 + amount;
                 if (this.health <= 0) {
@@ -105,9 +110,11 @@ export default class Ship extends DynamicObject {
 
             if (gameEngine.isOwnedByPlayer(this)) {
                 renderer.playerShip = this;
-                this.shipSprite.tint = 0x0000ff;
+                renderer.View.updateHealth(this.health, this.maxHealth);
+                renderer.View.updateArmor(this.shield, this.maxShield);
+                this.shipSprite.tint = 0x4153AF;
             } else {
-                this.shipSprite.tint = 0x000000;
+                this.shipSprite.tint = renderer.fgColor;
             }
 
         }

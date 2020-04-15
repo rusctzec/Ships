@@ -3,10 +3,18 @@ let PIXI;
 import Ship from '../common/Ship';
 import ExplosionEmitterConfig from './ExplosionEmitter.js'
 import {Howl, Howler} from 'howler';
+import View from '../common/View.js';
+
+
+let fgColor = 0x50444F;
+let bgColor = 0xE8D9D5;
 
 export default class ExRenderer extends Renderer {
     constructor(gameEngine, clientEngine) {
         super(gameEngine, clientEngine)
+        this.fgColor = fgColor;
+        this.bgColor = bgColor;
+        this.View = View;
         this.isReady = false;
         this.sprites = {};
         this.cameraShake = 0;
@@ -17,8 +25,8 @@ export default class ExRenderer extends Renderer {
         PIXI.settings.ROUND_PIXELS = true;
         PIXI.Loader.shared.baseUrl = "assets/images/"; // base url for all resources loaded by the loader
 
-        this.msgTextStyle = {fontFamily: 'serif', fontSize: 8, fill:0x000000, align: 'left'};
-        this.announcementTextStyle = {fontFamily: 'serif', fontSize: 12, fill:0x000000, align: 'center'};
+        this.msgTextStyle = {fontFamily: 'serif', fontSize: 8, fill:fgColor, align: 'left'};
+        this.announcementTextStyle = {fontFamily: 'serif', fontSize: 12, fill:fgColor, align: 'center'};
 
         this.sounds = {
             fireBullet: new Howl({
@@ -56,12 +64,13 @@ export default class ExRenderer extends Renderer {
     get manifest() {
         return {
             ship: "ship.png",
-            redsquare: "redsquare.png",
+            square: "square.png",
             bullet: "bullet.png",
             test: "test.png",
             spawnparticle: "spawnparticle.png",
             messageFont: "arial-11px.fnt",
             announcementFont: "arial-11px.fnt",
+            barricade: "barricade.png"
         }
     }
 
@@ -93,7 +102,7 @@ export default class ExRenderer extends Renderer {
             let worldWidth = this.gameEngine.worldSettings.width;
             let worldHeight = this.gameEngine.worldSettings.height;
             let stageBoundaries = new PIXI.Graphics();
-            stageBoundaries.beginFill(0x000000);
+            stageBoundaries.beginFill(fgColor);
             stageBoundaries.drawRect(-worldWidth, -worldHeight-borderWidth, worldWidth*2+borderWidth, borderWidth) // topleft to topright
             stageBoundaries.drawRect(-worldWidth-borderWidth, -worldHeight-borderWidth, borderWidth, worldHeight*2+borderWidth); // topleft to bottomleft
             stageBoundaries.drawRect(-worldWidth-borderWidth, worldHeight, worldWidth*2+borderWidth, borderWidth); // bottomleft to bottomright
@@ -121,22 +130,7 @@ export default class ExRenderer extends Renderer {
                 this.paddingLayer = new PIXI.Container();
                 this.stage.addChild(this.paddingLayer);
 
-                // test camera crosshair
-                this.cameraCenter = new PIXI.Sprite(resources.redsquare.texture);
-                this.cameraCenter.tint = 0x000000;
-                this.cameraCenter.scale.set(0.5,0.5);
-                this.cameraCenter.anchor.set(0.5,0.5);
-                this.cameraCenter.x = this.viewportWidth/2;
-                this.cameraCenter.y = this.viewportHeight/2;
-                //this.stage.addChild(this.cameraCenter);
-
                 this.stage.addChild(this.camera);
-
-                // test red square
-                this.testSprite = new PIXI.Sprite(resources.redsquare.texture);
-                this.testSprite.x = 50; this.testSprite.y = 50;
-                this.testSprite.anchor.set(0.5, 0.5);
-                this.layer1.addChild(this.testSprite);
 
                 this.hudLayer = new PIXI.Container();
                 this.stage.addChild(this.hudLayer);
@@ -155,9 +149,9 @@ export default class ExRenderer extends Renderer {
 
                 this.chatGraphics = new PIXI.Graphics(); // group graphics elements together for toggling opacity
                 this.chatGraphics.alpha = 0;
-                this.chatGraphics.beginFill(0x000000, 0.05); // draw main box
+                this.chatGraphics.beginFill(fgColor, 0.05); // draw main box
                 this.chatGraphics.drawRect(0, 0, this.viewportWidth*0.60, this.viewportHeight*3);
-                this.chatGraphics.beginFill(0x000000, 0.6); // draw separator
+                this.chatGraphics.beginFill(fgColor, 0.6); // draw separator
                 this.chatGraphics.drawRect(0, this.viewportHeight, this.viewportWidth*0.60, 1);
                 this.chatBox.addChild(this.chatGraphics);
                 this.hudLayer.addChild(this.chatBox);
@@ -278,7 +272,7 @@ export default class ExRenderer extends Renderer {
     onDOMLoaded() {
         // add PIXI renderer to document when ready
         this.renderer = PIXI.autoDetectRenderer({width: this.viewportWidth, height: this.viewportHeight});
-        this.renderer.backgroundColor = 0xffffff;
+        this.renderer.backgroundColor = bgColor;
         let canvasContainer = document.getElementById("canvas-container");
         canvasContainer.appendChild(this.renderer.view);
     }
