@@ -1,5 +1,6 @@
 import { SimplePhysicsEngine, GameEngine, TwoVector } from 'lance-gg';
 import Ship from '../common/Ship';
+import Barricade from '../common/Barricade';
 import Projectile from '../common/Projectile';
 export default class ExGameEngine extends GameEngine {
     constructor(options) {
@@ -23,10 +24,25 @@ export default class ExGameEngine extends GameEngine {
             return Math.sqrt(Math.pow(vec2.x - vec1.x, 2) + Math.pow(vec2.y - vec1.y, 2) * 1.0);
         }
 
+        Math.dot = function(vec1, vec2) {
+            if (!vec1 || !vec2) return NaN;
+            if (isNaN(vec1.x) || isNaN(vec1.y) || isNaN(vec2.x) || isNaN(vec2.y)) return NaN;
+            return vec1.x * vec2.x + vec1.y * vec2.y;
+        }
+
+        Math.angleToUnit = function(angle, targetVec={}) {
+            targetVec.x = Math.cos(angle*Math.PI/180); targetVec.y = Math.sin(angle*Math.PI/180);
+            return targetVec;
+        }
+        Math.unitToAngle = function(vec) {
+            return Math.atan2(vec.y, vec.x)*180/Math.PI;
+        };
+
         this.initWorld();
     }
 
     registerClasses(serializer) {
+        serializer.registerClass(Barricade);
         serializer.registerClass(Ship);
         serializer.registerClass(Projectile);
     }
@@ -46,9 +62,11 @@ export default class ExGameEngine extends GameEngine {
 
         // collision handler
         this.on('collisionStart', e => {
+            console.log(e);
             let collisionObjects = Object.keys(e).map(k => e[k])
             let ships = collisionObjects.filter(e => e instanceof Ship);
             let projectiles = collisionObjects.filter(e => e instanceof Projectile);
+            let barricades = collisionObjects.filter(e => e instanceof Barricade);
             for (let ship of ships) {
                 if (isNaN(ship.position.x) || isNaN(ship.position.y)) return;
             }
@@ -71,6 +89,16 @@ export default class ExGameEngine extends GameEngine {
 
                 ships[0].velocity.copy(newVelocity).multiplyScalar(-1);
                 ships[1].velocity.copy(newVelocity);
+            } else if (ships[0] && barricades[0]) { // ship bumps into barricade
+                let direction = (new TwoVector).copy(barricades[0].position).subtract(ships[0].position).normalize();
+                let angle = Math.unitToAngle(direction);
+                let angleDiff = barricades[0].angle - angle;
+                let unitDiff = Math.angleToUnit(angleDiff, new TwoVector());
+                console.log(angleDiff);
+                //ships[0].velocity = unitDiff.multiplyScalar(2);
+            } else if (projectiles[0] && barricades[0]) { // bullet hits barricade
+                barricades[0].takeDamage("projectile", projectiles[0].damage)
+                this.removeObjectFromWorld(projectiles[0]);
             }
         });
         this.on('postStep', this.gameLogic.bind(this));
@@ -78,6 +106,7 @@ export default class ExGameEngine extends GameEngine {
 
     gameLogic() {
         let ships = this.world.queryObjects({instanceType: Ship});
+        let barricades = this.world.queryObjects({instanceType: Barricade});
 
         // limit position within world boundaries
         for (let i in this.world.objects) {
@@ -153,18 +182,39 @@ export default class ExGameEngine extends GameEngine {
         }
     }
 
+    randomizeSpawnPosition(avoidObjs=[], idealDistance=80, worldMargin=0.90, iterations=30) {
+        let spawnPosition;
+        for (let i = 0; i < iterations; i++) {
+            spawnPosition = {
+                x: (Math.random()-0.5) * this.worldSettings.width*worldMargin,
+                y: (Math.random()-0.5) * this.worldSettings.height*worldMargin
+            }
+            if (avoidObjs.every(obj => Math.abs(Math.vectorDistance(spawnPosition, obj.position)) > idealDistance)) break;
+        }
+        return spawnPosition
+    }
+
+    makeBarricade() {
+        let barricades = this.world.queryObjects({instanceType: Barricade});
+
+        let spawnPosition = this.randomizeSpawnPosition(barricades);
+
+        let barricade = new Barricade(this, null, {
+            position: new TwoVector(spawnPosition.x, spawnPosition.y)
+        });
+
+        this.addObjectToWorld(barricade);
+        return barricade;
+
+    }
+
     makeShip(playerId, username) { // instance a new ship in the world, assigned to a player
+        this.makeBarricade();
         console.log("makeShip")
         // try to find a good empty space for the ship to spawn
         let ships = this.world.queryObjects({instanceType: Ship});
-        let spawnPosition;
-        for (let i = 0; i < 30; i++) {
-            spawnPosition = {
-                x: (Math.random()-0.5) * this.worldSettings.width*0.90,
-                y: (Math.random()-0.5) * this.worldSettings.height*0.90
-            }
-            if (ships.every(ship => Math.abs(Math.vectorDistance(spawnPosition, ship.position)) > 80)) break;
-        }
+
+        let spawnPosition = this.randomizeSpawnPosition(ships);
 
         let ship = new Ship(this, null, {
             position: new TwoVector(spawnPosition.x, spawnPosition.y),
@@ -205,4 +255,7 @@ export default class ExGameEngine extends GameEngine {
         }, this, [obj.id]);
     }
 
+    spawnPickup(chance=0.5, type) {
+
+    }
 }

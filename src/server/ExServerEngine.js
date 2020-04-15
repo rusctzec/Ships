@@ -1,5 +1,5 @@
 import { ServerEngine } from 'lance-gg';
-
+import passport from '../config/passport';
 export default class ExServerEngine extends ServerEngine {
     constructor(io, gameEngine, inputOptions) {
         super(io, gameEngine, inputOptions);
@@ -16,7 +16,7 @@ export default class ExServerEngine extends ServerEngine {
 
     onPlayerConnected(socket) {
         super.onPlayerConnected(socket);
-        console.log("player connected d")
+        console.log("player connected")
         let makePlayerShip = () => {
             console.log("requestRestart: makePlayerShip")
             let ship = this.gameEngine.makeShip(socket.playerId, "player "+socket.playerId);
