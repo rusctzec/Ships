@@ -2,6 +2,7 @@ import { SimplePhysicsEngine, GameEngine, TwoVector } from 'lance-gg';
 import Ship from '../common/Ship';
 import Barricade from '../common/Barricade';
 import Projectile from '../common/Projectile';
+import Pickup from '../common/Pickup';
 export default class ExGameEngine extends GameEngine {
     constructor(options) {
         super(options);
@@ -45,6 +46,7 @@ export default class ExGameEngine extends GameEngine {
         serializer.registerClass(Barricade);
         serializer.registerClass(Ship);
         serializer.registerClass(Projectile);
+        serializer.registerClass(Pickup);
     }
 
     initWorld() {
@@ -255,7 +257,15 @@ export default class ExGameEngine extends GameEngine {
         }, this, [obj.id]);
     }
 
-    spawnPickup(chance=0.5, type) {
+    spawnPickup(location, chance=0.5, type) {
 
+        if (Math.random() < chance) {
+            let pickup = new Pickup(this, null, {
+                position: location,
+                type: type
+            });
+
+            this.addObjectToWorld(pickup);
+        }
     }
 }

@@ -194,10 +194,7 @@ export default class ExRenderer extends Renderer {
             let objData = this.gameEngine.world.objects[objId];
             let sprite = this.sprites[objId];
 
-            sprite.position.set(objData.position.x, objData.position.y);
-            if (sprite.shipSprite) {
-                sprite.shipSprite.angle = objData.angle+90;
-            } else sprite.angle = objData.angle+90;
+            if (objData) objData.draw();
         }
 
         // render the main stage container (everything is parented to this)

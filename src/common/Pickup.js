@@ -2,13 +2,16 @@ import { BaseTypes, DynamicObject, Renderer, TwoVector } from 'lance-gg';
 import ExplosionEmitterConfig from '../client/ExplosionEmitter.js';
 import SpawnEmitterConfig from '../client/SpawnEmitter.js';
 let PixiParticles;
-export default class Barricade extends DynamicObject {
+export default class Pickup extends DynamicObject {
     constructor(gameEngine, options, props) {
         super(gameEngine, options, props);
         this.health = 5;
-        this.friction = new TwoVector(1.0, 1.0);
+        this.friction = new TwoVector(0.95, 0.95);
+
+        this.type = 0
+        if (props) this.type = this.props.type || 0;
+
         this.height = 28; this.width = 28;
-        //this.velocity = new TwoVector(0.1,0.1);
 
         if (typeof window != "undefined") {
             PixiParticles = require('pixi-particles');
@@ -25,7 +28,7 @@ export default class Barricade extends DynamicObject {
 
     static get netScheme() {
         return Object.assign({
-            health: {type: BaseTypes.TYPES.INT8}
+            type: {type: BaseTypes.TYPES.INT8}
         }, super.netScheme);
     }
 
@@ -62,8 +65,21 @@ export default class Barricade extends DynamicObject {
             this.container = new PIXI.Container();
             this.container.position.set(this.position.x, this.position.y);
             renderer.layer2.addChild(this.container);
+            switch(this.type) {
+                case 1: // health pickup
+                this.sprite = new PIXI.Sprite(PIXI.Loader.shared.resources.healthpickup.texture)
+                    break;
+                case 2: // shield pickup
+                this.sprite = new PIXI.Sprite(PIXI.Loader.shared.resources.shieldpickup.texture)
+                    break;
+                default: // (0) points orb
+                this.sprite = new PIXI.Sprite(PIXI.Loader.shared.resources.spawnparticle.texture)
+            }
 
-            this.sprite = new PIXI.Sprite(PIXI.Loader.shared.resources.barricade.texture)
+            this.height = this.sprite.height;
+            this.width = this.sprite.width;
+
+            this.sprite.tint = 0x87FF95;
             renderer.sprites[this.id] = this.sprite;
             this.sprite.anchor.set(0.5, 0.5);
             this.container.addChild(this.sprite);

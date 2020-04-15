@@ -46,6 +46,11 @@ export default class Ship extends DynamicObject {
         this.maxShield = other.maxShield;
     }
 
+    draw() {
+        this.sprite.position.set(this.position.x, this.position.y);
+        this.shipSprite.angle = this.angle+90;
+    }
+
     takeDamage(damageType, amount) {
         this.health -= amount;
         if (Renderer) {

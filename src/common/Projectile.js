@@ -1,6 +1,6 @@
 import { BaseTypes, DynamicObject, Renderer } from 'lance-gg';
 
-export default class Missile extends DynamicObject {
+export default class Projectile extends DynamicObject {
 
     constructor(gameEngine, options, props){
         super(gameEngine, options, props);
@@ -21,12 +21,16 @@ export default class Missile extends DynamicObject {
 
     // position correction if less than world width/height
 
+    draw() {
+        this.sprite.position.set(this.position.x, this.position.y);
+    }
+
     onAddToWorld(gameEngine) {
         console.log("projectile shot", this.width, this.height);
         if (Renderer) {
             let renderer = Renderer.getInstance();
             renderer.sounds.fireBullet.play();
-            let sprite = new PIXI.Sprite(PIXI.Loader.shared.resources.bullet.texture)
+            let sprite = this.sprite = new PIXI.Sprite(PIXI.Loader.shared.resources.bullet.texture)
             renderer.sprites[this.id] = sprite;
             sprite.anchor.set(0.5, 0.5);
             sprite.position.set(this.position.x, this.position.y);
