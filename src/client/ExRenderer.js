@@ -273,6 +273,7 @@ export default class ExRenderer extends Renderer {
         // add PIXI renderer to document when ready
         this.renderer = PIXI.autoDetectRenderer({width: this.viewportWidth, height: this.viewportHeight});
         this.renderer.backgroundColor = bgColor;
+        //this.renderer.view.classList.add("nes-container", "is-rounded");
         let canvasContainer = document.getElementById("canvas-container");
         canvasContainer.appendChild(this.renderer.view);
     }

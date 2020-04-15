@@ -1,4 +1,4 @@
-# Group Project 2 
+# Ships - Group Project 2 
 ![License](https://img.shields.io/github/license/DVasquez4155/Group-Project-2) ![Language](https://img.shields.io/github/languages/top/DVasquez4155/Group-Project-2) ![Latest Commit](https://img.shields.io/github/last-commit/DVasquez4155/Group-Project-2)
 ## Table of Contents
 * [Installation](#Installation)
