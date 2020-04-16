@@ -13,9 +13,15 @@
 ## Description
 
 ```
-As a bored person at home during this quarantine with nothing to do but listen to our kids scream and ask for their 32nd snack of the afternoon praying for nap time to come. I need something to do. I need to let my frustrations out I need to blow shit up.
+As a bored person at home during this quarantine with nothing to
+do but listen to our kids scream and ask for their 32nd snack of
+the afternoon praying for nap time to come. I need something to
+ do. I need to let my frustrations out I need to blow shit up.
 
-I give you Ships. The free to play game that kills useless time in the day that is simple user friendly and just plan fun. Fly around our world for an hour, 10 mins or your kids entire nap. It doesn't matter.
+I give you Ships. The free to play game that kills useless
+time in the day that is simple user friendly and just
+plan fun. Fly around our world for an hour, 10 mins or your
+ids entire nap. It doesn't matter.
 
 
 ```
