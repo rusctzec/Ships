@@ -45,7 +45,7 @@ export default class Projectile extends DynamicObject {
         console.log("projectile shot", this.width, this.height);
         if (Renderer) {
             let renderer = Renderer.getInstance();
-            this.sounds.fireBullet.play();
+            renderer.playSound("fireBullet", this.position);
             let sprite = this.sprite = new PIXI.Sprite(PIXI.Loader.shared.resources.bullet.texture)
             renderer.sprites[this.id] = sprite;
             sprite.anchor.set(0.5, 0.5);

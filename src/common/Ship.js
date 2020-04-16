@@ -89,7 +89,8 @@ export default class Ship extends DynamicObject {
     }
 
     draw() {
-        if (this.playerShip) console.log(this.playerShip.maxHealth);
+        if (this.playerShip) {
+        }
         this.sprite.position.set(this.position.x+this.width/2, this.position.y+this.height/2);
         this.shipSprite.angle = this.angle+90;
         for (let i in this.sounds) {
@@ -111,7 +112,7 @@ export default class Ship extends DynamicObject {
         }
         if (Renderer) {
             let renderer = Renderer.getInstance();
-            if (this == renderer.playerShip) this.sounds.pickup.play();
+            if (this == renderer.playerShip) renderer.sounds.pickup.play();
             renderer.updatePoints(this.points);
             renderer.View.updateHealth(this.health, this.maxHealth);
             renderer.View.updateArmor(this.shield, this.maxShield);
@@ -185,7 +186,7 @@ export default class Ship extends DynamicObject {
         }
         if (Renderer) {
             let renderer = Renderer.getInstance();
-            this.sounds.takeDamage.play();
+            renderer.playSound("takeDamage", this.position);
             this.shipSprite.tint = 0xff0000;
             this.gameEngine.timer.add(3, () => {
                 if (this.gameEngine.isOwnedByPlayer(this)) {
@@ -197,7 +198,7 @@ export default class Ship extends DynamicObject {
             if (this == renderer.playerShip) {
                 renderer.View.updateHealth(this.health, this.maxHealth);
                 renderer.View.updateArmor(this.shield, this.maxShield);
-                this.sounds.playerHurt.play();
+                renderer.playSound("playerHurt", this.position);
                 renderer.cameraShake = 4 + amount;
                 if (this.health <= 0) {
                     renderer.announcement.text = "you died\npress enter to respawn";
@@ -213,7 +214,7 @@ export default class Ship extends DynamicObject {
         console.log("ship added to world", this.width, this.height)
         if (Renderer) {
             let renderer = Renderer.getInstance();
-            this.sounds.spawn.play();
+            renderer.playSound("spawn", this.position);
             // assume PIXI has been set globally on the window;
             let sprite = this.sprite = new PIXI.Container();
             this.shipSprite = sprite.shipSprite = new PIXI.Sprite(PIXI.Loader.shared.resources.ship.texture)
@@ -265,7 +266,7 @@ export default class Ship extends DynamicObject {
         if (Renderer) {
             let renderer = Renderer.getInstance();
             console.log("ship removed from scene");
-            this.sounds.shipDestroyed.play();
+            renderer.sounds.shipDestroyed.play();
             let sprite = renderer.sprites[this.id];
             sprite.shipSprite.destroy();
             this.shipText.destroy();

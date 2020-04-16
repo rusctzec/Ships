@@ -6,7 +6,7 @@ export default class Barricade extends DynamicObject {
     constructor(gameEngine, options, props) {
         super(gameEngine, options, props);
         this.health = 5;
-        this.friction = new TwoVector(1.0, 1.0);
+        this.friction = new TwoVector(0.95, 0.95);
         this.height = 28; this.width = 28;
         //this.velocity = new TwoVector(0.1,0.1);
 
@@ -64,7 +64,7 @@ export default class Barricade extends DynamicObject {
         this.health -= amount;
         if (Renderer) {
             let renderer = Renderer.getInstance();
-            this.sounds.takeDamage.play();
+            renderer.playSound("takeDamage", this.position);
             this.sprite.tint = 0xff0000;
             this.gameEngine.timer.add(3, () => {
                 this.sprite.tint = renderer.fgColor;
@@ -78,7 +78,7 @@ export default class Barricade extends DynamicObject {
     onAddToWorld(gameEngine) {
         if (Renderer) {
             let renderer = Renderer.getInstance();
-            this.sounds.spawn.play();
+            renderer.playSound("spawn", this.position);
             // assume PIXI has been set globally on the window;
             this.container = new PIXI.Container();
             this.container.position.set(this.position.x, this.position.y);
@@ -114,7 +114,7 @@ export default class Barricade extends DynamicObject {
 
         if (Renderer) {
             let renderer = Renderer.getInstance();
-            this.sounds.shipDestroyed.play();
+            renderer.playSound("shipDestroyed", this.position);
             delete renderer.sprites[this.id];
             this.sprite.destroy();
 

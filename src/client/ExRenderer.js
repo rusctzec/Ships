@@ -1,4 +1,4 @@
-import { Renderer } from 'lance-gg';
+import { Renderer, TwoVector } from 'lance-gg';
 let PIXI;
 import Ship from '../common/Ship';
 import ExplosionEmitterConfig from './ExplosionEmitter.js'
@@ -29,6 +29,7 @@ export default class ExRenderer extends Renderer {
         this.uiTextStyle = {fontFamily: 'serif', fontSize: 8, fill:fgColor, align: 'center'};
         this.announcementTextStyle = {fontFamily: 'serif', fontSize: 12, fill:fgColor, align: 'center'};
 
+        this.playerPosition = new TwoVector(0,0);
 
         this.sounds = {
             fireBullet: new Howl({
@@ -61,6 +62,9 @@ export default class ExRenderer extends Renderer {
             deny: new Howl({
                 src: 'assets/audio/deny.wav'
             }),
+            pickupDestroyed: new Howl({
+                src: 'assets/audio/pickupDestroyed.wav'
+            }),
             pickup: new Howl({
                 src: 'assets/audio/pickup.wav'
             }),
@@ -69,6 +73,12 @@ export default class ExRenderer extends Renderer {
             }),
         }
 
+        this.playSound = function(soundName, location) {
+            let level = 1-Math.min(Math.vectorDistance(this.playerPosition, location)/200, 1)
+            if (level > 0) {
+                this.sounds[soundName].play()
+            }
+        }
     }
 
 
@@ -231,7 +241,9 @@ export default class ExRenderer extends Renderer {
         this.cooldownBar.clear();
         if (this.playerShip) {
 
-
+        if (this.playerShip) {
+            this.playerPosition.set(this.playerShip.position.x, this.playerShip.position.y);
+        }
             //Howler.pos(this.playerShip.x+this.playerShip.width/2, this.playerShip.y+this.playerShip.height/2, 0);
 
             let cooldownBarLength = 60;

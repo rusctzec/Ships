@@ -63,7 +63,7 @@ export default class Pickup extends DynamicObject {
 
         if (Renderer) {
             let renderer = Renderer.getInstance();
-            this.sounds.spawn.play();
+            renderer.playSound("spawn", this.position);
             // assume PIXI has been set globally on the window;
             this.container = new PIXI.Container();
             this.container.position.set(this.position.x, this.position.y);
@@ -107,7 +107,7 @@ export default class Pickup extends DynamicObject {
         console.log("picked up");
         if (Renderer) {
             let renderer = Renderer.getInstance();
-            this.sounds.destroy.play();
+            renderer.playSound("pickupDestroyed", this.position);
             delete renderer.sprites[this.id];
             this.sprite.destroy();
 

@@ -149,10 +149,10 @@ export default class ExGameEngine extends GameEngine {
 
                 if (didCollide && this.renderer) {
                     if (obj instanceof Ship) {
-                        obj.sounds.collide.play();
+                        this.renderer.playSound("collide", obj.position);
                         if (obj == this.renderer.playerShip) this.renderer.cameraShake += 4;
                     } else {
-                        if (obj.sounds && obj.sounds.collide) obj.sounds.collide.play();
+                        this.renderer.playSound("smallCollide", obj.position);
                     }
                 }
 
