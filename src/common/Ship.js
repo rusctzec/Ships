@@ -10,7 +10,7 @@ export default class Ship extends DynamicObject {
         this.friction = new TwoVector(0.98,0.98);
         this.fireRate = 1;
         this.shield = 0;
-        this.points = 30;
+        this.points = 0;
         this.damage = 1;
         this.maxShield = this.startingShield = 20;
 
