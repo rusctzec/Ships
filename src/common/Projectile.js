@@ -1,10 +1,21 @@
 import { BaseTypes, DynamicObject, Renderer } from 'lance-gg';
-
+import {Howl} from 'howler';
 export default class Projectile extends DynamicObject {
 
     constructor(gameEngine, options, props){
         super(gameEngine, options, props);
         this.damage = 1;
+
+        /*
+        this.sounds = {
+            collide: new Howl({
+                src: "assets/audio/smallCollide.wav"
+            }),
+            fireBullet: new Howl({
+                src: "assets/audio/fireBullet.wav"
+            }),
+        }
+        */
     }
 
     static get bending() {
@@ -15,7 +26,8 @@ export default class Projectile extends DynamicObject {
 
     static get netScheme() {
         return Object.assign({
-            damage: { type: BaseTypes.TYPES.INT32}
+            damage: { type: BaseTypes.TYPES.INT32},
+            inputId: { type: BaseTypes.TYPES.INT32}
         }, super.netScheme)
     }
 
@@ -23,13 +35,17 @@ export default class Projectile extends DynamicObject {
 
     draw() {
         this.sprite.position.set(this.position.x, this.position.y);
+
+        for (let i in this.sounds) {
+            //this.sounds[i].pos(this.position.x, this.position.y, 0);
+        }
     }
 
     onAddToWorld(gameEngine) {
         console.log("projectile shot", this.width, this.height);
         if (Renderer) {
             let renderer = Renderer.getInstance();
-            renderer.sounds.fireBullet.play();
+            this.sounds.fireBullet.play();
             let sprite = this.sprite = new PIXI.Sprite(PIXI.Loader.shared.resources.bullet.texture)
             renderer.sprites[this.id] = sprite;
             sprite.anchor.set(0.5, 0.5);
@@ -46,10 +62,15 @@ export default class Projectile extends DynamicObject {
                 delete renderer.sprites[this.id];
             }
         }
+
+        for (let i in this.sounds) {
+            this.sounds[i].unload();
+        }
     }
 
     syncTo(other) {
         super.syncTo(other);
         this.damage = other.damage;
+        this.inputId = other.inputId;
     }
 }

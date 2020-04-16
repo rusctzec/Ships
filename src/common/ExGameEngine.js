@@ -1,4 +1,4 @@
-import { SimplePhysicsEngine, GameEngine, TwoVector } from 'lance-gg';
+import { SimplePhysicsEngine, GameEngine, TwoVector} from 'lance-gg';
 import Ship from '../common/Ship';
 import Barricade from '../common/Barricade';
 import Projectile from '../common/Projectile';
@@ -52,8 +52,8 @@ export default class ExGameEngine extends GameEngine {
     initWorld() {
         super.initWorld({
             worldWrap: false,
-            width: 100,
-            height: 100
+            width: 250,
+            height: 250
         });
     }
 
@@ -64,11 +64,12 @@ export default class ExGameEngine extends GameEngine {
 
         // collision handler
         this.on('collisionStart', e => {
-            console.log(e);
             let collisionObjects = Object.keys(e).map(k => e[k])
             let ships = collisionObjects.filter(e => e instanceof Ship);
             let projectiles = collisionObjects.filter(e => e instanceof Projectile);
             let barricades = collisionObjects.filter(e => e instanceof Barricade);
+            let pickups = collisionObjects.filter(e => e instanceof Pickup);
+
             for (let ship of ships) {
                 if (isNaN(ship.position.x) || isNaN(ship.position.y)) return;
             }
@@ -80,6 +81,7 @@ export default class ExGameEngine extends GameEngine {
                 ships[0].takeDamage("projectile", projectiles[0].damage)
                 console.log(ships[0].health);
                 this.removeObjectFromWorld(projectiles[0]);
+
             } else if (ships[0] && ships[1]) { // ship hit by other ship
                 console.log("ship hit by ship")
                 return
@@ -91,6 +93,7 @@ export default class ExGameEngine extends GameEngine {
 
                 ships[0].velocity.copy(newVelocity).multiplyScalar(-1);
                 ships[1].velocity.copy(newVelocity);
+
             } else if (ships[0] && barricades[0]) { // ship bumps into barricade
                 let direction = (new TwoVector).copy(barricades[0].position).subtract(ships[0].position).normalize();
                 let angle = Math.unitToAngle(direction);
@@ -98,9 +101,19 @@ export default class ExGameEngine extends GameEngine {
                 let unitDiff = Math.angleToUnit(angleDiff, new TwoVector());
                 console.log(angleDiff);
                 //ships[0].velocity = unitDiff.multiplyScalar(2);
+
             } else if (projectiles[0] && barricades[0]) { // bullet hits barricade
                 barricades[0].takeDamage("projectile", projectiles[0].damage)
                 this.removeObjectFromWorld(projectiles[0]);
+
+            } else if (ships[0] && pickups[0]) {
+                if (this.serverEngine) {
+                    this.serverEngine.io.sockets.emit('pickupClaimed', ships[0].playerId, pickups[0].type);
+                    this.removeObjectFromWorld(pickups[0]);
+                    ships[0].collectPickup(pickups[0].type)
+                    console.log("pickup claimed");
+                }
+
             }
         });
         this.on('postStep', this.gameLogic.bind(this));
@@ -113,6 +126,7 @@ export default class ExGameEngine extends GameEngine {
         // limit position within world boundaries
         for (let i in this.world.objects) {
             let obj = this.world.objects[i];
+            let position = obj.position
             if (obj.position && obj.velocity) {
                 let didCollide = false;
                 if (obj.position.x > this.worldSettings.width) {
@@ -135,10 +149,10 @@ export default class ExGameEngine extends GameEngine {
 
                 if (didCollide && this.renderer) {
                     if (obj instanceof Ship) {
-                        this.renderer.sounds.collide.play();
+                        obj.sounds.collide.play();
                         if (obj == this.renderer.playerShip) this.renderer.cameraShake += 4;
                     } else {
-                        this.renderer.sounds.smallCollide.play();
+                        if (obj.sounds && obj.sounds.collide) obj.sounds.collide.play();
                     }
                 }
 
@@ -170,9 +184,17 @@ export default class ExGameEngine extends GameEngine {
                 if (playerShip.cooldown && this.timer.currentTime - playerShip.cooldown.startOffset < playerShip.cooldown.time) {
                     return
                 } else {
-                    this.makeProjectile(playerShip);
-                    playerShip.cooldown = this.timer.add(60*(1/playerShip.fireRate), ()=>{});
+                    this.makeProjectile(playerShip, inputData.messageIndex);
+                    playerShip.cooldown = this.timer.add(60/Math.pow(1.2,playerShip.fireRate), ()=>{});
                 }
+            } else if (inputData.input == 'upgrade1') {
+                playerShip.buyUpgrade(1);
+            } else if (inputData.input == 'upgrade2') {
+                playerShip.buyUpgrade(2);
+            } else if (inputData.input == 'upgrade3') {
+                playerShip.buyUpgrade(3);
+            } else if (inputData.input == 'upgrade4') {
+                playerShip.buyUpgrade(4);
             }
         } else {
             if (inputData.input == 'enter') {
@@ -211,7 +233,6 @@ export default class ExGameEngine extends GameEngine {
     }
 
     makeShip(playerId, username) { // instance a new ship in the world, assigned to a player
-        this.makeBarricade();
         console.log("makeShip")
         // try to find a good empty space for the ship to spawn
         let ships = this.world.queryObjects({instanceType: Ship});
@@ -230,15 +251,18 @@ export default class ExGameEngine extends GameEngine {
         return ship;
     }
 
-    makeProjectile(playerShip) {
+    makeProjectile(playerShip, inputId) {
         console.log("makeProjectile");
         let projectile = new Projectile(this);
         projectile.width = 1;
         projectile.height = 1;
         projectile.position.copy(playerShip.position);
+        projectile.position.x += playerShip.width/2;
+        projectile.position.y += playerShip.height/2;
         projectile.velocity.copy(playerShip.velocity);
         projectile.angle = playerShip.angle;
         projectile.playerId = playerShip.playerId;
+        projectile.inputId = inputId; // this property is really good when you set it it just automatically handles transient continuity between a server and client object with the same inputid so you don't get duplicate ghosts on the client
         projectile.ownerId = playerShip.id;
         projectile.velocity.x += Math.cos(projectile.angle * (Math.PI / 180)) * 2;
         projectile.velocity.y += Math.sin(projectile.angle * (Math.PI / 180)) * 2;
@@ -258,7 +282,7 @@ export default class ExGameEngine extends GameEngine {
     }
 
     spawnPickup(location, chance=0.5, type) {
-
+        if (this.renderer) return; // only run on server
         if (Math.random() < chance) {
             let pickup = new Pickup(this, null, {
                 position: location,

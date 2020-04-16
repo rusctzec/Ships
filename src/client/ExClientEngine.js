@@ -22,7 +22,12 @@ export default class ExClientEngine extends ClientEngine {
     console.log("client engine started!");
 
     this.gameEngine.on("objectDestroyed", (obj) => {});
-
+    this.gameEngine.on("shipUpgraded", playerId => {
+      if (playerId == this.gameEngine.playerId && this.renderer.playerShip) {
+        this.renderer.updateSkills(this.renderer.playerShip);
+        this.renderer.updatePoints(this.renderer.playerShip.points);
+      }
+    })
     this.gameEngine.once("renderer.ready", () => {
       console.log("renderer.ready!!!");
       this.controls = new KeyboardControls(this);
@@ -32,6 +37,10 @@ export default class ExClientEngine extends ClientEngine {
       this.controls.bindKey("down", "down", { repeat: true });
       this.controls.bindKey("space", "fire", { repeat: false });
       this.controls.bindKey("enter", "enter", { repeat: false });
+      this.controls.bindKey("1", "upgrade1", { repeat: false });
+      this.controls.bindKey("2", "upgrade2", { repeat: false });
+      this.controls.bindKey("3", "upgrade3", { repeat: false });
+      this.controls.bindKey("4", "upgrade4", { repeat: false });
       this.controls.bindKey("m", "missile", { repeat: false });
 
       this.boundKeys = this.controls.boundKeys;
@@ -85,6 +94,17 @@ export default class ExClientEngine extends ClientEngine {
           this.gameEngine.renderer.sounds.receiveMessage.play();
         }
       });
+
+
+      this.socket.on("pickupClaimed", (playerId, pickupType) => {
+          let ship = this.gameEngine.world.queryObject({
+              instanceType: Ship,
+              playerId: playerId
+          });
+
+          ship && ship.collectPickup(pickupType);
+      });
+
 
       this.socket.emit("requestRestart");
     });

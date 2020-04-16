@@ -5,17 +5,42 @@ let PixiParticles;
 export default class Ship extends DynamicObject {
     constructor(gameEngine, options, props) {
         super(gameEngine, options, props);
-        this.health = 6;
-        this.maxHealth = 6;
+        this.maxHealth = this.startingHealth = 4;
+        this.health = this.maxHealth
         this.friction = new TwoVector(0.98,0.98);
-        this.fireRate = 2;
+        this.fireRate = 1;
         this.shield = 0;
-        this.maxShield = 20;
+        this.points = 30;
+        this.damage = 1;
+        this.maxShield = this.startingShield = 20;
 
         if (props) this.username = props.username || "";
         if (typeof window != "undefined") {
             PixiParticles = require('pixi-particles');
         }
+
+        /*
+        this.sounds = {
+            pickup: new Howl({
+                src: "assets/audio/pickup.wav"
+            }),
+            spawn: new Howl({
+                src: "assets/audio/spawn.wav"
+            }),
+            takeDamage: new Howl({
+                src: "assets/audio/takeDamage.wav"
+            }),
+            collide: new Howl({
+                src: "assets/audio/collide.wav"
+            }),
+            shipDestroyed: new Howl({
+                src: "assets/audio/shipDestroyed.wav"
+            }),
+            playerHurt: new Howl({
+                src: "assets/audio/playerHurt.wav"
+            }),
+        }
+        */
     }
 
     static get bending() {
@@ -34,28 +59,133 @@ export default class Ship extends DynamicObject {
             fireRate: {type: BaseTypes.TYPES.INT8},
             shield: {type: BaseTypes.TYPES.INT16},
             maxShield: {type: BaseTypes.TYPES.INT16},
+            points: {type: BaseTypes.TYPES.INT16},
+            damage: {type: BaseTypes.TYPES.INT16},
         }, super.netScheme);
     }
 
     syncTo(other) {
         super.syncTo(other);
+        /*
+        if (Renderer) {
+            let renderer = Renderer.getInstance();
+            if (this.health != other.health || this.maxHealth != other.maxHealth) {
+                renderer.View.updateHealth(other.health, other.maxHealth);
+            }
+            if (this.shield != other.shield || this.maxHealth != other.maxHealth) {
+                renderer.View.updateArmor(other.shield, other.maxHealth);
+            }
+
+        }
+        */
         this.health = other.health;
         this.maxHealth = other.maxHealth;
         this.fireRate = other.fireRate;
         this.shield = other.shield;
         this.maxShield = other.maxShield;
+        this.points = other.points;
+        this.damage = other.damage;
+
     }
 
     draw() {
-        this.sprite.position.set(this.position.x, this.position.y);
+        if (this.playerShip) console.log(this.playerShip.maxHealth);
+        this.sprite.position.set(this.position.x+this.width/2, this.position.y+this.height/2);
         this.shipSprite.angle = this.angle+90;
+        for (let i in this.sounds) {
+            //this.sounds[i].pos(this.position.x, this.position.y, 0);
+        }
+    }
+
+    collectPickup(type) {
+        switch (type) {
+            case 0: // give 1 point
+                this.points += 1;
+            break;
+            case 1: // give 2 points of health (1 heart)
+                this.health = Math.min(this.health + 2, this.maxHealth);
+            break;
+            case 2: // give 20 points of shield
+                this.shield = Math.min(this.shield + 20, this.maxShield);
+            break;
+        }
+        if (Renderer) {
+            let renderer = Renderer.getInstance();
+            if (this == renderer.playerShip) this.sounds.pickup.play();
+            renderer.updatePoints(this.points);
+            renderer.View.updateHealth(this.health, this.maxHealth);
+            renderer.View.updateArmor(this.shield, this.maxShield);
+        }
+    }
+
+    buyUpgrade(type) { // should only run for playership
+        let success = false;
+        let cost = this.getUpgradeCost(type);
+        switch(type) {
+            case 1:
+                if (this.points >= cost) {
+                    success = true;
+                    this.points -= cost;
+                    this.maxHealth += 2;
+                    this.health += 2;
+                    console.log("Newhealth", this.health)
+                }
+                break;
+            case 2:
+                if (this.points >= cost) {
+                    success = true;
+                    this.points -= cost;
+                    this.maxShield += 20;
+                }
+                break;
+            case 3:
+                if (this.points >= cost) {
+                    success = true;
+                    this.points -= cost;
+                    this.fireRate += 1;
+                }
+                break;
+        }
+
+        if (success && this.gameEngine.serverEngine) {
+            this.gameEngine.serverEngine.io.sockets.emit('shipUpgraded', this.playerId);
+        }
+
+        if (Renderer) {
+            let renderer = Renderer.getInstance()
+
+            if (success) {
+                renderer.sounds.powerup.play();
+            } else {
+                renderer.sounds.deny.play();
+                renderer.skillBox.position.x += (Math.random()-0.5)*5;
+                renderer.skillBox.position.y += Math.random()*5;
+            }
+            renderer.updateSkills(this);
+            renderer.updatePoints(this.points);
+        }
+    }
+
+    getUpgradeCost(type) {
+        switch (type) {
+            case 1:
+                return Math.max(Math.floor((this.maxHealth-this.startingHealth)), 1);
+            case 2:
+                return Math.max(Math.floor((this.maxShield-this.startingShield)/40), 1);
+            case 3:
+                return this.fireRate;
+        }
     }
 
     takeDamage(damageType, amount) {
-        this.health -= amount;
+        if (this.shield > 0) {
+            this.shield -= amount*10;
+        } else {
+            this.health -= amount;
+        }
         if (Renderer) {
             let renderer = Renderer.getInstance();
-            renderer.sounds.takeDamage.play();
+            this.sounds.takeDamage.play();
             this.shipSprite.tint = 0xff0000;
             this.gameEngine.timer.add(3, () => {
                 if (this.gameEngine.isOwnedByPlayer(this)) {
@@ -67,7 +197,7 @@ export default class Ship extends DynamicObject {
             if (this == renderer.playerShip) {
                 renderer.View.updateHealth(this.health, this.maxHealth);
                 renderer.View.updateArmor(this.shield, this.maxShield);
-                renderer.sounds.playerHurt.play();
+                this.sounds.playerHurt.play();
                 renderer.cameraShake = 4 + amount;
                 if (this.health <= 0) {
                     renderer.announcement.text = "you died\npress enter to respawn";
@@ -83,7 +213,7 @@ export default class Ship extends DynamicObject {
         console.log("ship added to world", this.width, this.height)
         if (Renderer) {
             let renderer = Renderer.getInstance();
-            renderer.sounds.spawn.play();
+            this.sounds.spawn.play();
             // assume PIXI has been set globally on the window;
             let sprite = this.sprite = new PIXI.Container();
             this.shipSprite = sprite.shipSprite = new PIXI.Sprite(PIXI.Loader.shared.resources.ship.texture)
@@ -101,7 +231,7 @@ export default class Ship extends DynamicObject {
 
             this.spawnEmitter = new PixiParticles.Emitter(
                 sprite,
-                [PIXI.Loader.shared.resources.spawnparticle.texture],
+                [PIXI.Loader.shared.resources.pointsorb.texture],
                 SpawnEmitterConfig
             );
             this.spawnEmitter.autoUpdate = true;
@@ -115,6 +245,9 @@ export default class Ship extends DynamicObject {
 
             if (gameEngine.isOwnedByPlayer(this)) {
                 renderer.playerShip = this;
+                console.log("fgDSKJHGFDJKHGFDIU")
+                renderer.updateSkills(this);
+                renderer.updatePoints(this.points);
                 renderer.View.updateHealth(this.health, this.maxHealth);
                 renderer.View.updateArmor(this.shield, this.maxShield);
                 this.shipSprite.tint = 0x4153AF;
@@ -126,10 +259,13 @@ export default class Ship extends DynamicObject {
     }
 
     onRemoveFromWorld(gameEngine) {
+        this.gameEngine.spawnPickup(this.position, 1, 0)
+        this.gameEngine.spawnPickup(this.position, 0.25, Math.round(Math.random())+1)
+
         if (Renderer) {
             let renderer = Renderer.getInstance();
             console.log("ship removed from scene");
-            renderer.sounds.shipDestroyed.play();
+            this.sounds.shipDestroyed.play();
             let sprite = renderer.sprites[this.id];
             sprite.shipSprite.destroy();
             this.shipText.destroy();
@@ -138,12 +274,19 @@ export default class Ship extends DynamicObject {
 
             this.explosionEmitter.autoUpdate = true;
             this.explosionEmitter.playOnceAndDestroy();
-            this.gameEngine.timer.add(Math.round(this.explosionEmitter.maxLifetime*60), ()=>{this.sprite.destroy()}, this)
+            this.spawnEmitter.destroy();
+            this.gameEngine.timer.add(Math.round(this.explosionEmitter.maxLifetime*60), ()=>{
+                this.sprite.destroy()
+                for (let i in this.sounds) {
+                    this.sounds[i].unload();
+                }
+            }, this)
 
             if (this == renderer.playerShip) {
                 if (renderer.announcement.text == '') renderer.announcement.text = 'press enter to respawn';
                 delete renderer.playerShip;
             }
+
 
         }
     }

@@ -13,6 +13,23 @@ export default class Barricade extends DynamicObject {
         if (typeof window != "undefined") {
             PixiParticles = require('pixi-particles');
         }
+
+        /*
+        this.sounds = {
+            spawn: new Howl({
+                src: "assets/audio/spawn.wav"
+            }),
+            takeDamage: new Howl({
+                src: "assets/audio/takeDamage.wav"
+            }),
+            collide: new Howl({
+                src: "assets/audio/collide.wav"
+            }),
+            shipDestroyed: new Howl({
+                src: "assets/audio/shipDestroyed.wav"
+            }),
+        }
+        */
     }
 
     static get bending() {
@@ -35,15 +52,19 @@ export default class Barricade extends DynamicObject {
     }
 
     draw() {
-        this.container.position.set(this.position.x, this.position.y);
+        this.container.position.set(this.position.x+this.width/2, this.position.y+this.height/2);
         this.sprite.angle = this.angle+90;
+
+        for (let i in this.sounds) {
+            //this.sounds[i].pos(this.position.x, this.position.y, 0);
+        }
     }
 
     takeDamage(damageType, amount) {
         this.health -= amount;
         if (Renderer) {
             let renderer = Renderer.getInstance();
-            renderer.sounds.takeDamage.play();
+            this.sounds.takeDamage.play();
             this.sprite.tint = 0xff0000;
             this.gameEngine.timer.add(3, () => {
                 this.sprite.tint = renderer.fgColor;
@@ -57,7 +78,7 @@ export default class Barricade extends DynamicObject {
     onAddToWorld(gameEngine) {
         if (Renderer) {
             let renderer = Renderer.getInstance();
-            renderer.sounds.spawn.play();
+            this.sounds.spawn.play();
             // assume PIXI has been set globally on the window;
             this.container = new PIXI.Container();
             this.container.position.set(this.position.x, this.position.y);
@@ -87,16 +108,27 @@ export default class Barricade extends DynamicObject {
     }
 
     onRemoveFromWorld(gameEngine) {
+        this.gameEngine.spawnPickup(this.position, 0.50, Math.round(Math.random())+1)
+        this.gameEngine.spawnPickup(this.position, 0.25, Math.round(Math.random())+1)
+        this.gameEngine.spawnPickup(this.position, 0.10, 2)
+
         if (Renderer) {
             let renderer = Renderer.getInstance();
-            renderer.sounds.shipDestroyed.play();
+            this.sounds.shipDestroyed.play();
             delete renderer.sprites[this.id];
             this.sprite.destroy();
 
             this.explosionEmitter.autoUpdate = true;
             this.explosionEmitter.playOnceAndDestroy();
-            this.gameEngine.timer.add(Math.round(this.explosionEmitter.maxLifetime*60), ()=>{this.container.destroy()}, this)
+            this.spawnEmitter.destroy();
+            this.gameEngine.timer.add(Math.round(this.explosionEmitter.maxLifetime*60+60), ()=>{
+                this.container.destroy()
+                for (let i in this.sounds) {
+                    this.sounds[i].unload();
+                }
+            }, this)
 
         }
+
     }
 }

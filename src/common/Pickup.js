@@ -1,26 +1,36 @@
 import { BaseTypes, DynamicObject, Renderer, TwoVector } from 'lance-gg';
 import ExplosionEmitterConfig from '../client/ExplosionEmitter.js';
+import {Howl} from 'howler';
 import SpawnEmitterConfig from '../client/SpawnEmitter.js';
 let PixiParticles;
 export default class Pickup extends DynamicObject {
     constructor(gameEngine, options, props) {
         super(gameEngine, options, props);
-        this.health = 5;
         this.friction = new TwoVector(0.95, 0.95);
 
         this.type = 0
-        if (props) this.type = this.props.type || 0;
+        if (props) this.type = props.type || 0;
 
-        this.height = 28; this.width = 28;
+        this.height = 13; this.width = 13;
 
         if (typeof window != "undefined") {
             PixiParticles = require('pixi-particles');
+
+            /*
+            this.sounds = {
+                destroy: new Howl({
+                    src: "assets/audio/pickupDestroyed.wav"
+                }),
+                spawn: new Howl({
+                    src: "assets/audio/spawn.wav"
+                }),
+            };
+            */
         }
     }
 
     static get bending() {
         return {
-            health: { percent: 1.0 },
             position: { percent: 1.0 },
             angle: {percent: 1.0},
         }
@@ -34,33 +44,26 @@ export default class Pickup extends DynamicObject {
 
     syncTo(other) {
         super.syncTo(other);
-        this.health = other.health;
     }
 
     draw() {
-        this.container.position.set(this.position.x, this.position.y);
-        this.sprite.angle = this.angle+90;
+        this.container.position.set(this.position.x+this.width/2, this.position.y+this.height/2);
+
+        for (let i in this.sounds) {
+            //this.sounds[i].pos(this.position.x, this.position.y, 0);
+        }
     }
 
-    takeDamage(damageType, amount) {
-        this.health -= amount;
-        if (Renderer) {
-            let renderer = Renderer.getInstance();
-            renderer.sounds.takeDamage.play();
-            this.sprite.tint = 0xff0000;
-            this.gameEngine.timer.add(3, () => {
-                this.sprite.tint = renderer.fgColor;
-            }, this);
-        }
-        if (this.health <= 0 && !Renderer) {
-            this.gameEngine.removeObjectFromWorld(this);
-        }
-    }
 
     onAddToWorld(gameEngine) {
+        console.log("pickup added to world");
+
+        this.velocity.x = (Math.random()-0.5)*5;
+        this.velocity.y = (Math.random()-0.5)*5;
+
         if (Renderer) {
             let renderer = Renderer.getInstance();
-            renderer.sounds.spawn.play();
+            this.sounds.spawn.play();
             // assume PIXI has been set globally on the window;
             this.container = new PIXI.Container();
             this.container.position.set(this.position.x, this.position.y);
@@ -73,13 +76,12 @@ export default class Pickup extends DynamicObject {
                 this.sprite = new PIXI.Sprite(PIXI.Loader.shared.resources.shieldpickup.texture)
                     break;
                 default: // (0) points orb
-                this.sprite = new PIXI.Sprite(PIXI.Loader.shared.resources.spawnparticle.texture)
+                this.sprite = new PIXI.Sprite(PIXI.Loader.shared.resources.pointsorb.texture)
             }
 
             this.height = this.sprite.height;
-            this.width = this.sprite.width;
 
-            this.sprite.tint = 0x87FF95;
+            this.sprite.tint = 0x5DAF66;
             renderer.sprites[this.id] = this.sprite;
             this.sprite.anchor.set(0.5, 0.5);
             this.container.addChild(this.sprite);
@@ -97,21 +99,27 @@ export default class Pickup extends DynamicObject {
                 ExplosionEmitterConfig
             );
 
-            this.sprite.tint = renderer.fgColor;
 
         }
     }
 
     onRemoveFromWorld(gameEngine) {
+        console.log("picked up");
         if (Renderer) {
             let renderer = Renderer.getInstance();
-            renderer.sounds.shipDestroyed.play();
+            this.sounds.destroy.play();
             delete renderer.sprites[this.id];
             this.sprite.destroy();
 
             this.explosionEmitter.autoUpdate = true;
             this.explosionEmitter.playOnceAndDestroy();
-            this.gameEngine.timer.add(Math.round(this.explosionEmitter.maxLifetime*60), ()=>{this.container.destroy()}, this)
+            this.spawnEmitter.destroy();
+            this.gameEngine.timer.add(Math.round(this.explosionEmitter.maxLifetime*60), ()=>{
+                this.container.destroy()
+                for (let i in this.sounds) {
+                    this.sounds[i].unload();
+                }
+            }, this)
 
         }
     }

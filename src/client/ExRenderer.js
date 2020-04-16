@@ -26,7 +26,9 @@ export default class ExRenderer extends Renderer {
         PIXI.Loader.shared.baseUrl = "assets/images/"; // base url for all resources loaded by the loader
 
         this.msgTextStyle = {fontFamily: 'serif', fontSize: 8, fill:fgColor, align: 'left'};
+        this.uiTextStyle = {fontFamily: 'serif', fontSize: 8, fill:fgColor, align: 'center'};
         this.announcementTextStyle = {fontFamily: 'serif', fontSize: 12, fill:fgColor, align: 'center'};
+
 
         this.sounds = {
             fireBullet: new Howl({
@@ -56,7 +58,17 @@ export default class ExRenderer extends Renderer {
             spawn: new Howl({
                 src: 'assets/audio/spawn.wav'
             }),
+            deny: new Howl({
+                src: 'assets/audio/deny.wav'
+            }),
+            pickup: new Howl({
+                src: 'assets/audio/pickup.wav'
+            }),
+            powerup: new Howl({
+                src: 'assets/audio/powerup.wav'
+            }),
         }
+
     }
 
 
@@ -66,11 +78,13 @@ export default class ExRenderer extends Renderer {
             ship: "ship.png",
             square: "square.png",
             bullet: "bullet.png",
-            test: "test.png",
             spawnparticle: "spawnparticle.png",
             messageFont: "arial-11px.fnt",
             announcementFont: "arial-11px.fnt",
-            barricade: "barricade.png"
+            barricade: "barricade.png",
+            healthpickup: "healthpickup.png",
+            shieldpickup: "shieldpickup.png",
+            pointsorb: "pointsorb.png",
         }
     }
 
@@ -95,6 +109,7 @@ export default class ExRenderer extends Renderer {
             });
         }
 
+        //Howler.pos(0,0,0);
 
         return new Promise((resolve, reject) => {
 
@@ -143,7 +158,18 @@ export default class ExRenderer extends Renderer {
                 this.cooldownBar.position.set(5, this.viewportHeight - 10);
                 this.hudLayer.addChild(this.cooldownBar);
 
+                this.pointsCount = new PIXI.Text('0pts', this.announcementTextStyle) // counter for points
+                this.pointsCount.position.set(5, this.viewportHeight - 15 - this.pointsCount.height)
+                this.hudLayer.addChild(this.pointsCount);
 
+                this.skillBox = new PIXI.Graphics();
+                this.skillBox.position.set(10+this.pointsCount.width, this.viewportHeight - 20);
+                this.skillBox.skillSpacing = 15;
+                this.skillBox.healthCost = new PIXI.Text('aa',this.uiTextStyle); this.skillBox.healthCost.position.set(0*this.skillBox.skillSpacing, 0)
+                this.skillBox.shieldCost = new PIXI.Text('aa',this.uiTextStyle); this.skillBox.shieldCost.position.set(1*this.skillBox.skillSpacing, 0)
+                this.skillBox.fireRateCost = new PIXI.Text('aa',this.uiTextStyle); this.skillBox.fireRateCost.position.set(2*this.skillBox.skillSpacing, 0)
+                this.skillBox.addChild(this.skillBox.healthCost, this.skillBox.shieldCost, this.skillBox.fireRateCost);
+                this.hudLayer.addChild(this.skillBox);
                 this.chatBox = new PIXI.Container(); // main chatbox container
                 this.chatBox.position.set(this.viewportWidth - this.viewportWidth*0.60 - 5, -15)
 
@@ -204,6 +230,10 @@ export default class ExRenderer extends Renderer {
         // cooldown bar animation
         this.cooldownBar.clear();
         if (this.playerShip) {
+
+
+            //Howler.pos(this.playerShip.x+this.playerShip.width/2, this.playerShip.y+this.playerShip.height/2, 0);
+
             let cooldownBarLength = 60;
             if (this.playerShip.cooldown && this.gameEngine.timer.currentTime - this.playerShip.cooldown.startOffset < this.playerShip.cooldown.time) {
                 let cooldownTime = this.gameEngine.timer.currentTime - this.playerShip.cooldown.startOffset;
@@ -226,6 +256,8 @@ export default class ExRenderer extends Renderer {
 
         this.chatHistory.position.y = Math.lerp(this.chatHistory.position.y, this.chatScrollOffset, 0.10);
 
+        this.skillBox.position.x = Math.lerp(this.skillBox.position.x, 10 + this.pointsCount.width, 0.10);
+        this.skillBox.position.y = Math.lerp(this.skillBox.position.y, this.viewportHeight - 20, 0.10);
     }
 
     centerCamera(x, y) {
@@ -235,6 +267,28 @@ export default class ExRenderer extends Renderer {
         this.camera.x = Math.lerp(this.camera.x, this.viewportWidth / 2 - x, 0.10);
         this.camera.y = Math.lerp(this.camera.y, this.viewportHeight / 2 - y, 0.10);
 
+    }
+
+    updatePoints(points) {
+        this.pointsCount.text = `${points}pts`;
+    }
+
+    updateSkills(player) {
+        this.skillBox.beginFill(0x5DAF66)
+        for (let i=0; i<Math.max(Math.floor((player.maxHealth-player.startingHealth)/2)-1,0); i++) {
+            this.skillBox.drawRect(this.skillBox.skillSpacing*0, i*-2-3, 4, 1)
+        }
+        for (let i=0; i<Math.max(Math.floor((player.maxShield-player.startingShield)/20),0); i++) {
+            this.skillBox.drawRect(this.skillBox.skillSpacing*1, i*-2-3, 4, 1)
+        }
+        for (let i=0; i<Math.max(player.fireRate-1,0); i++) {
+            this.skillBox.drawRect(this.skillBox.skillSpacing*2, i*-2-3, 4, 1)
+        }
+        this.View.updateHealth(player.health, player.maxHealth);
+        this.View.updateArmor(player.shield, player.maxShield);
+        this.skillBox.healthCost.text = "$"+player.getUpgradeCost(1);
+        this.skillBox.shieldCost.text = "$"+player.getUpgradeCost(2);
+        this.skillBox.fireRateCost.text = "$"+player.getUpgradeCost(3);
     }
 
     toggleChat(enabled) { // called by clientEngine, toggles chatbox UI on and off
