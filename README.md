@@ -1,4 +1,4 @@
-# Ships - Group Project 2
+# 🚀SHIPS🚀 - Group Project 2
 
 ![License](https://img.shields.io/github/license/DVasquez4155/Group-Project-2) ![Language](https://img.shields.io/github/languages/top/DVasquez4155/Group-Project-2) ![Latest Commit](https://img.shields.io/github/last-commit/DVasquez4155/Group-Project-2)
 
@@ -26,7 +26,7 @@ ids entire nap. It doesn't matter.
 
 ```
 
-[![Image that shows the project](./assets/img/icon.png)](https://DVasquez4155.github.io/Group-Project-2)
+[![Image that shows the project](./assets/img/icon.png)](https://stormy-badlands-59062.herokuapp.com/)
 
 ## Installation
 
