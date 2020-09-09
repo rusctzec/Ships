@@ -1,18 +1,16 @@
-// *********************************************************************************
-// Server.js - This file is the initial starting point for the Node/Express server.
-// *********************************************************************************
+
 import path from 'path';
 import express from 'express';
 import socketIO from 'socket.io';
 import { Lib } from 'lance-gg';
 
 var PORT = process.env.PORT || 7070;
-const INDEX = path.join(__dirname, '../dist/index.html');
 
 // define routes and socket
 const app = express();
 app.get('/', function(req, res) { res.render("game"); });
 app.use('/', express.static(path.join(__dirname, '../dist/')));
+app.use('/', express.static(path.join(__dirname, '../public/')));
 let requestHandler = app.listen(PORT, () => console.log(`Listening on ${ PORT }`));
 const io = socketIO(requestHandler);
 
@@ -38,7 +36,7 @@ var passport = require("./config/passport");
 
 app.use(require('express-session')({
   //change secret
-  secret: 'keyboardless cat',
+  secret: '675e0d149bab4058bdf8dfb4ca2ba8f3',
   resave: true,
   saveUninitialized: true
 }));
