@@ -1,51 +1,21 @@
 <script type="text/javascript" src="assets/js/login.js"></script>
 <div class="row">
-    <div class="row">
-        <div class="col">
-            <div class="nes-container with-title is-rounded">
-                <div class="title">
-                    <a href='https://github.com/DVasquez4155/Group-Project-2'>
-                        <i class="nes-icon github"></i>
-                    </a>
-                </div>
-                <div>
-                    <p>Description</p>
-                </div>
-                <div>
-                    <br>
-                    <p>
-                        <a href="https://github.com/DVasquez4155/">
-                        <img src="https://avatars0.githubusercontent.com/u/22107830?v=4" style="max-width:100%;" width="50"> Daniel Vasquez Talavera</a> <a href="https://github.com/krease23">
-                        <br>
-                        <img src="https://avatars0.githubusercontent.com/u/58020708?v=4" style="max-width:100%;" width="50"> Kermit Bonner</a> <a href="https://github.com/ConradRodgers">
-                        <br>
-                        <img src="https://avatars0.githubusercontent.com/u/58347782?v=4" style="max-width:100%;" width="50"> Conrad</a> <a href="https://github.com/rafaelestradajr">
-                        <br>
-                        <img src="https://avatars3.githubusercontent.com/u/13290490?v=4" style="max-width:100%;" width="50"> rafaelestradajr</a> <a href="https://github.com/rusctzec">
-                        <br>
-                        <img src="https://avatars0.githubusercontent.com/u/55525550?v=4" style="max-width:100%;" width="50"> rusctzec</a> <a href="https://github.com/alfierr">
-                        <br>
-                        <img src="https://avatars1.githubusercontent.com/u/58712976?v=4" style="max-width:100%;" width="50"> alfierr</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-md-offset-3">
-            <div class="card">
-                <form id='login' class='card-body nes-container is-rounded'>
-                    <div class="form-group nes-field">
-                        <label for="email">Email address</label>
-                        <input type="email" class="form-control nes-input" id="email" aria-describedby="emailHelp"
-                            placeholder="Email">
-                    </div>
-                    <div class="form-group nes-field">
-                        <label for="password">Password</label>
-                        <input type="password" class="form-control nes-input" id="password" placeholder="Password">
-                        <span id='wrong' style="display: none;" class="hide error text-danger">Either you're not
-                            registered or the password is wrong!</span>
-                    </div>
-                    <button type="submit" class="nes-btn is-primary">Login</button>
-                </form>
-            </div>
-        </div>
-    </div>
+  <div class="col">
+    {{> credits }}
+  </div>
+  <div class="col-md-6 col-md-offset-3">
+    <form class="card-body nes-container is-rounded" id="login" >
+      <div class="form-group nes-field">
+        <label for="email">Email address</label>
+        <input type="email" class="form-control nes-input" id="email" aria-describedby="emailHelp"
+          placeholder="Email" required>
+      </div>
+      <div class="form-group nes-field">
+        <label for="password">Password</label>
+        <input type="password" class="form-control nes-input" id="password" placeholder="Password" required>
+      </div>
+      <div id="alert" style="height: 0; overflow: hidden;" class="error text-danger">Password and email combination do not match a known account</div>
+      <button type="submit" class="nes-btn is-primary">Login</button>
+    </form>
+  </div>
+</div>

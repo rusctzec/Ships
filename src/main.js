@@ -54,8 +54,13 @@ app.use('/css', express.static(process.cwd() + '/node_modules/nes.css/css')); //
 // Set Handlebars.
 var exphbs = require("express-handlebars");
 
-app.engine("handlebars", exphbs({ defaultLayout: "main" }));
+app.engine("handlebars", exphbs({
+  defaultLayout: "main",
+  layoutsDir: path.resolve(__dirname, "../views/layouts/"),
+  partialsDir: path.resolve(__dirname, "../views/partials/"),
+}));
 app.set("view engine", "handlebars");
+
 
 // Routes
 require("./routes/api.js")(app);

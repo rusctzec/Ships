@@ -28,8 +28,23 @@ module.exports = function (app) {
                 res.redirect(307, "/api/login");
             })
             .catch(function (err) {
-                console.log(err)
-                res.status(401).json(err);
+                console.log("ERROR!!", err)
+                var response = {error: "Signup error"};
+                var error = err.errors[0];
+                if (error && error.type == "unique violation") {
+                    response.error =
+                        error.path == "users.email" ?
+                        "Email already in use" :
+                        error.path == "users.username" ?
+                        "Username already in use" :
+                        response.error;
+                } else if (error && error.type == "Validation error") {
+                    response.error =
+                        error.path == "email" ?
+                        "Invalid email" :
+                        response.error;
+                }
+                res.status(401).json(response);
             });
     });
     // Route for logging user out
