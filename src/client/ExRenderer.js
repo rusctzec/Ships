@@ -264,6 +264,7 @@ export default class ExRenderer extends Renderer {
             this.cooldownBar.beginFill(0xffdd00);
             this.cooldownBar.drawRect(0,0,cooldownBarLength,5);
 
+            // draw health pips
             this.healthBar.beginFill(0xcc006c, 0.2);
             for (let i=0; i < this.playerShip.maxHealth; i++) {
                 this.healthBar.drawRect(i*7, 0, 6, 3)
@@ -272,10 +273,17 @@ export default class ExRenderer extends Renderer {
             for (let i=0; i < this.playerShip.health; i++) {
                 this.healthBar.drawRect(i*7, 0, 6, 3)
             }
+
+            // draw shield bar
             this.shieldBar.beginFill(0x409ff4, 0.7);
             this.shieldBar.drawRect(0,0,this.playerShip.shield/3,1)
             this.shieldBar.beginFill(0x409ff4, 0.2);
             this.shieldBar.drawRect(0,0,this.playerShip.maxShield/3,1)
+
+            this.updatePoints(this.playerShip.points);
+
+            this.updateSkills(this.playerShip);
+
             // center the camera
             cameraTarget = this.playerShip;
         }
@@ -307,15 +315,16 @@ export default class ExRenderer extends Renderer {
     }
 
     updateSkills(player) {
+        this.skillBox.clear();
         this.skillBox.beginFill(0x5DAF66)
-        for (let i=0; i<Math.max(Math.floor((player.maxHealth-player.startingHealth)/2)-1,0); i++) {
-            this.skillBox.drawRect(this.skillBox.skillSpacing*0, i*-2-3, 4, 1)
+        for (let i=0; i<player.upgradesBought[1]; i++) {
+            this.skillBox.drawRect(this.skillBox.skillSpacing*0, i*-2-3, 4, 1);
         }
-        for (let i=0; i<Math.max(Math.floor((player.maxShield-player.startingShield)/20),0); i++) {
-            this.skillBox.drawRect(this.skillBox.skillSpacing*1, i*-2-3, 4, 1)
+        for (let i=0; i<player.upgradesBought[2]; i++) {
+            this.skillBox.drawRect(this.skillBox.skillSpacing*1, i*-2-3, 4, 1);
         }
-        for (let i=0; i<Math.max(player.fireRate-1,0); i++) {
-            this.skillBox.drawRect(this.skillBox.skillSpacing*2, i*-2-3, 4, 1)
+        for (let i=0; i<player.upgradesBought[3]; i++) {
+            this.skillBox.drawRect(this.skillBox.skillSpacing*2, i*-2-3, 4, 1);
         }
         this.skillBox.healthCost.text = "$"+player.getUpgradeCost(1);
         this.skillBox.shieldCost.text = "$"+player.getUpgradeCost(2);

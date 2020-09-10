@@ -10,9 +10,10 @@ export default class Ship extends DynamicObject {
         this.friction = new TwoVector(0.98,0.98);
         this.fireRate = 1;
         this.shield = 0;
-        this.points = 0;
+        this.points = 5;
         this.damage = 1;
         this.maxShield = this.startingShield = 20;
+        this.upgradesBought = [0, 0, 0, 0];
 
         if (props) this.username = props.username || "";
         if (typeof window != "undefined") {
@@ -61,6 +62,7 @@ export default class Ship extends DynamicObject {
             maxShield: {type: BaseTypes.TYPES.INT16},
             points: {type: BaseTypes.TYPES.INT16},
             damage: {type: BaseTypes.TYPES.INT16},
+            upgradesBought: {type: BaseTypes.TYPES.LIST, itemType: BaseTypes.TYPES.INT16},
         }, super.netScheme);
     }
 
@@ -74,6 +76,7 @@ export default class Ship extends DynamicObject {
         this.maxShield = other.maxShield;
         this.points = other.points;
         this.damage = other.damage;
+        this.upgradesBought = other.upgradesBought;
 
     }
 
@@ -114,8 +117,9 @@ export default class Ship extends DynamicObject {
                 if (this.points >= cost) {
                     success = true;
                     this.points -= cost;
-                    this.maxHealth += 2;
-                    this.health += 2;
+                    this.maxHealth += 1;
+                    this.health += 1;
+                    this.upgradesBought[1]++;
                     console.log("Newhealth", this.health)
                 }
                 break;
@@ -124,6 +128,7 @@ export default class Ship extends DynamicObject {
                     success = true;
                     this.points -= cost;
                     this.maxShield += 20;
+                    this.upgradesBought[2]++;
                 }
                 break;
             case 3:
@@ -131,6 +136,7 @@ export default class Ship extends DynamicObject {
                     success = true;
                     this.points -= cost;
                     this.fireRate += 1;
+                    this.upgradesBought[3]++;
                 }
                 break;
         }
@@ -141,13 +147,13 @@ export default class Ship extends DynamicObject {
 
         if (Renderer) {
             let renderer = Renderer.getInstance()
+            renderer.skillBox.position.x += (Math.random()-0.5)*5;
+            renderer.skillBox.position.y += Math.random()*5;
 
             if (success) {
                 renderer.sounds.powerup.play();
             } else {
                 renderer.sounds.deny.play();
-                renderer.skillBox.position.x += (Math.random()-0.5)*5;
-                renderer.skillBox.position.y += Math.random()*5;
             }
             renderer.updateSkills(this);
             renderer.updatePoints(this.points);
@@ -157,7 +163,7 @@ export default class Ship extends DynamicObject {
     getUpgradeCost(type) {
         switch (type) {
             case 1:
-                return Math.max(Math.floor((this.maxHealth-this.startingHealth)), 1);
+                return Math.max(Math.floor((this.maxHealth-this.startingHealth)*2), 1);
             case 2:
                 return Math.max(Math.floor((this.maxShield-this.startingShield)/40), 1);
             case 3:
