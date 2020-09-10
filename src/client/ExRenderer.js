@@ -3,7 +3,6 @@ let PIXI;
 import Ship from '../common/Ship';
 import ExplosionEmitterConfig from './ExplosionEmitter.js'
 import {Howl, Howler} from 'howler';
-import View from '../common/View.js';
 
 
 let fgColor = 0x50444F;
@@ -14,7 +13,6 @@ export default class ExRenderer extends Renderer {
         super(gameEngine, clientEngine)
         this.fgColor = fgColor;
         this.bgColor = bgColor;
-        this.View = View;
         this.isReady = false;
         this.sprites = {};
         this.cameraShake = 0;
@@ -164,6 +162,15 @@ export default class ExRenderer extends Renderer {
                 this.announcement.position.set(this.viewportWidth/2, this.viewportHeight/2);
                 this.announcement.anchor.set(0.5, 0.5); this.hudLayer.addChild(this.announcement);
 
+                this.healthBar = new PIXI.Graphics();
+                this.healthBar.position.set(5, 5);
+                this.hudLayer.addChild(this.healthBar);
+
+                this.shieldBar = new PIXI.Graphics();
+                this.shieldBar.position.set(5, 10);
+                this.hudLayer.addChild(this.shieldBar);
+
+
                 this.cooldownBar = new PIXI.Graphics() // cooldown bar for firing rate
                 this.cooldownBar.position.set(5, this.viewportHeight - 10);
                 this.hudLayer.addChild(this.cooldownBar);
@@ -239,6 +246,8 @@ export default class ExRenderer extends Renderer {
         let cameraTarget;
         // cooldown bar animation
         this.cooldownBar.clear();
+        this.healthBar.clear();
+        this.shieldBar.clear();
         if (this.playerShip) {
 
         if (this.playerShip) {
@@ -255,6 +264,18 @@ export default class ExRenderer extends Renderer {
             this.cooldownBar.beginFill(0xffdd00);
             this.cooldownBar.drawRect(0,0,cooldownBarLength,5);
 
+            this.healthBar.beginFill(0xcc006c, 0.2);
+            for (let i=0; i < this.playerShip.maxHealth; i++) {
+                this.healthBar.drawRect(i*7, 0, 6, 3)
+            }
+            this.healthBar.beginFill(0xcc006c, 0.7);
+            for (let i=0; i < this.playerShip.health; i++) {
+                this.healthBar.drawRect(i*7, 0, 6, 3)
+            }
+            this.shieldBar.beginFill(0x409ff4, 0.7);
+            this.shieldBar.drawRect(0,0,this.playerShip.shield/3,1)
+            this.shieldBar.beginFill(0x409ff4, 0.2);
+            this.shieldBar.drawRect(0,0,this.playerShip.maxShield/3,1)
             // center the camera
             cameraTarget = this.playerShip;
         }
@@ -296,8 +317,6 @@ export default class ExRenderer extends Renderer {
         for (let i=0; i<Math.max(player.fireRate-1,0); i++) {
             this.skillBox.drawRect(this.skillBox.skillSpacing*2, i*-2-3, 4, 1)
         }
-        this.View.updateHealth(player.health, player.maxHealth);
-        this.View.updateArmor(player.shield, player.maxShield);
         this.skillBox.healthCost.text = "$"+player.getUpgradeCost(1);
         this.skillBox.shieldCost.text = "$"+player.getUpgradeCost(2);
         this.skillBox.fireRateCost.text = "$"+player.getUpgradeCost(3);

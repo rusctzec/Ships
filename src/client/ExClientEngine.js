@@ -14,6 +14,10 @@ export default class ExClientEngine extends ClientEngine {
     this.chatInput.style.opacity = 0;
     this.chatInput.style.width = "0px";
     this.chatInput.style.height = "0px";
+    this.chatInput.style.padding = "0px";
+    this.chatInput.style.border = "0px";
+    this.chatInput.style.margin = "0px";
+    this.chatInput.style.display = "block";
     this.gameEngine.renderer.chatInput = this.chatInput;
     document.body.appendChild(this.chatInput);
   }

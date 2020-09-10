@@ -66,18 +66,7 @@ export default class Ship extends DynamicObject {
 
     syncTo(other) {
         super.syncTo(other);
-        /*
-        if (Renderer) {
-            let renderer = Renderer.getInstance();
-            if (this.health != other.health || this.maxHealth != other.maxHealth) {
-                renderer.View.updateHealth(other.health, other.maxHealth);
-            }
-            if (this.shield != other.shield || this.maxHealth != other.maxHealth) {
-                renderer.View.updateArmor(other.shield, other.maxHealth);
-            }
 
-        }
-        */
         this.health = other.health;
         this.maxHealth = other.maxHealth;
         this.fireRate = other.fireRate;
@@ -114,8 +103,6 @@ export default class Ship extends DynamicObject {
             let renderer = Renderer.getInstance();
             if (this == renderer.playerShip) renderer.sounds.pickup.play();
             renderer.updatePoints(this.points);
-            renderer.View.updateHealth(this.health, this.maxHealth);
-            renderer.View.updateArmor(this.shield, this.maxShield);
         }
     }
 
@@ -196,8 +183,6 @@ export default class Ship extends DynamicObject {
                 }
             }, this);
             if (this == renderer.playerShip) {
-                renderer.View.updateHealth(this.health, this.maxHealth);
-                renderer.View.updateArmor(this.shield, this.maxShield);
                 renderer.playSound("playerHurt", this.position);
                 renderer.cameraShake = 4 + amount;
                 if (this.health <= 0) {
@@ -246,11 +231,8 @@ export default class Ship extends DynamicObject {
 
             if (gameEngine.isOwnedByPlayer(this)) {
                 renderer.playerShip = this;
-                console.log("fgDSKJHGFDJKHGFDIU")
                 renderer.updateSkills(this);
                 renderer.updatePoints(this.points);
-                renderer.View.updateHealth(this.health, this.maxHealth);
-                renderer.View.updateArmor(this.shield, this.maxShield);
                 this.shipSprite.tint = 0x4153AF;
             } else {
                 this.shipSprite.tint = renderer.fgColor;
