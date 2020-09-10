@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DVasquez4155/Group-Project-2.git"
+    "url": "git+https://github.com/rusctzec/ships.git"
   },
-  "author": "DVasquez4155",
+  "author": "rusctzec",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/DVasquez4155/Group-Project-2/issues"
+    "url": "https://github.com/rusctzec/ships/issues"
   },
-  "homepage": "https://github.com/DVasquez4155/Group-Project-2#readme",
+  "homepage": "https://github.com/rusctzec/ships",
   "dependencies": {
     "@babel/node": "^7.8.7",
     "babel-loader": "^8.1.0",

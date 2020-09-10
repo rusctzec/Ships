@@ -1,6 +1,6 @@
-# 🚀SHIPS🚀 - Group Project 2
+# Ships
 
-![License](https://img.shields.io/github/license/DVasquez4155/Group-Project-2) ![Language](https://img.shields.io/github/languages/top/DVasquez4155/Group-Project-2) ![Latest Commit](https://img.shields.io/github/last-commit/DVasquez4155/Group-Project-2)
+![License](https://img.shields.io/github/license/rusctzec/ships) ![Language](https://img.shields.io/github/languages/top/rusctzec/ships) ![Latest Commit](https://img.shields.io/github/last-commit/rusctzec/ships)
 
 ## Table of Contents
 
@@ -12,33 +12,37 @@
 
 ## Description
 
-```
-As a bored person at home during this quarantine with nothing to
-do but listen to our kids scream and ask for their 32nd snack of
-the afternoon praying for nap time to come. I need something to
- do. I need to let my frustrations out I need to blow shit up.
+Ships is a real-time online multiplayer browser game, where players pilot minimalistic vessels, battle one another, and upgrade their ships with points collected in battle.
 
-I give you Ships. The free to play game that kills useless
-time in the day that is simple user friendly and just
-plan fun. Fly around our world for an hour, 10 mins or your
-ids entire nap. It doesn't matter.
-
-
-```
-
-[![Image that shows the project](./assets/img/icon.png)](https://stormy-badlands-59062.herokuapp.com/)
+[![Image that shows the project](https://raw.githubusercontent.com/rusctzec/ships/master/public/assets/images/demo.gif)](https://r-ships.herokuapp.com/)
 
 ## Installation
 
-`npm i`
+Ensure [MySQL Server](https://dev.mysql.com/downloads/mysql/) is installed and running.
+
+
+
+Install dependencies with `npm i`
 
 ## Usage
 
-`npm start`
+* Build with `npm run build`
+* Run built project with `npm run start`
+* Start live development server with `npm run dev`
 
 ## Credits
 
-[<img src="https://avatars0.githubusercontent.com/u/22107830?v=4" width="50"/> Daniel Vasquez Talavera](https://github.com/DVasquez4155) [<img src="https://avatars0.githubusercontent.com/u/58020708?v=4" width="50"/> Kermit Bonner](https://github.com/krease23) [<img src="https://avatars0.githubusercontent.com/u/58347782?v=4" width="50"/> Conrad](https://github.com/ConradRodgers) [<img src="https://avatars3.githubusercontent.com/u/13290490?v=4" width="50"/> rafaelestradajr](https://github.com/rafaelestradajr) [<img src="https://avatars0.githubusercontent.com/u/55525550?v=4" width="50"/> rusctzec](https://github.com/rusctzec) [<img src="https://avatars1.githubusercontent.com/u/58712976?v=4" width="50"/> alfierr](https://github.com/alfierr)
+### Original Project Team
+* [<img src="https://avatars0.githubusercontent.com/u/22107830?v=4" width="50"/> Daniel Vasquez Talavera](https://github.com/DVasquez4155)
+* [<img src="https://avatars0.githubusercontent.com/u/58020708?v=4" width="50"/> Kermit Bonner](https://github.com/krease23)
+* [<img src="https://avatars0.githubusercontent.com/u/58347782?v=4" width="50"/> Conrad](https://github.com/ConradRodgers)
+* [<img src="https://avatars3.githubusercontent.com/u/13290490?v=4" width="50"/> rafaelestradajr](https://github.com/rafaelestradajr)
+* [<img src="https://avatars0.githubusercontent.com/u/55525550?v=4" width="50"/> rusctzec](https://github.com/rusctzec)
+* [<img src="https://avatars1.githubusercontent.com/u/58712976?v=4" width="50"/> alfierr](https://github.com/alfierr)
+
+### Continued Development
+
+* [<img src="https://avatars0.githubusercontent.com/u/55525550?v=4" width="50"/> rusctzec](https://github.com/rusctzec)
 
 ## Contributing
 
@@ -46,4 +50,4 @@ This project has adopted the code of conduct defined by [Contributor Covenant](h
 
 ## License
 
-Licensed under the [MIT License](https://choosealicense.com/licenses/mit/) license.
+Licensed under the [MIT License](https://choosealicense.com/licenses/mit/).
