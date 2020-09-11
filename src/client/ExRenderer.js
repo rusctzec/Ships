@@ -31,7 +31,8 @@ export default class ExRenderer extends Renderer {
 
         this.sounds = {
             fireBullet: new Howl({
-                src: 'assets/audio/fireBullet.wav'
+                src: 'assets/audio/fireBullet.wav',
+                volume: 0.5
             }),
             takeDamage: new Howl({
                 src: 'assets/audio/takeDamage.wav'
@@ -71,10 +72,31 @@ export default class ExRenderer extends Renderer {
             }),
         }
 
+        // this tacked-on array property will hold the IDs of every currently playing instance in a sound group
+        for (let i of Object.keys(this.sounds)) {
+            this.sounds[i].instances = [];
+        }
+
+        Howler.volume(0.4);
+
         this.playSound = function(soundName, location) {
-            let level = 1-Math.min(Math.vectorDistance(this.playerPosition, location)/200, 1)
+            let sound = this.sounds[soundName];
+            var loc = location || this.playerPosition;
+            let level = 1-Math.min(Math.vectorDistance(this.playerPosition, loc)/200, 1)
             if (level > 0) {
-                this.sounds[soundName].play()
+                if (sound.instances.length >= (sound.polyphony || 3)) {
+                    sound.stop(sound.instances[0]);
+                    sound.instances.splice(0, 1);
+                }
+                let id = sound.play();
+                sound.instances.push(id);
+                let cb = (e) => {
+                    let idx = sound.instances.indexOf(id);
+                    if (idx == -1) {return;}
+                    sound.instances.splice(idx, 1);
+                }
+                sound.on("end", cb, id);
+                sound.on("stop", cb, id);
             }
         }
     }
@@ -133,7 +155,6 @@ export default class ExRenderer extends Renderer {
             this.layer3.addChild(stageBoundaries);
 
             // format manifest for pixi to preload assets
-            console.log("manifest", this.manifest)
             let pixiManifest = Object.keys(this.manifest).map(o => {
                 return {
                     name: o,

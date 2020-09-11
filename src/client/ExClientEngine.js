@@ -33,7 +33,7 @@ export default class ExClientEngine extends ClientEngine {
       }
     })
     this.gameEngine.once("renderer.ready", () => {
-      console.log("renderer.ready!!!");
+      console.log("renderer ready");
       this.controls = new KeyboardControls(this);
       this.controls.bindKey("left", "left", { repeat: true });
       this.controls.bindKey("right", "right", { repeat: true });
@@ -83,8 +83,6 @@ export default class ExClientEngine extends ClientEngine {
   connect() {
     console.log("connect...");
     return super.connect().then(() => {
-      console.log("client engine connect function run");
-
       this.socket.on("disconnect", (e) => {
         this.gameEngine.renderer.announcement.text = "server disconnected";
         console.log("disconnected...");

@@ -19,29 +19,6 @@ export default class Ship extends DynamicObject {
         if (typeof window != "undefined") {
             PixiParticles = require('pixi-particles');
         }
-
-        /*
-        this.sounds = {
-            pickup: new Howl({
-                src: "assets/audio/pickup.wav"
-            }),
-            spawn: new Howl({
-                src: "assets/audio/spawn.wav"
-            }),
-            takeDamage: new Howl({
-                src: "assets/audio/takeDamage.wav"
-            }),
-            collide: new Howl({
-                src: "assets/audio/collide.wav"
-            }),
-            shipDestroyed: new Howl({
-                src: "assets/audio/shipDestroyed.wav"
-            }),
-            playerHurt: new Howl({
-                src: "assets/audio/playerHurt.wav"
-            }),
-        }
-        */
     }
 
     static get bending() {
@@ -85,9 +62,6 @@ export default class Ship extends DynamicObject {
         }
         this.sprite.position.set(this.position.x+this.width/2, this.position.y+this.height/2);
         this.shipSprite.angle = this.angle+90;
-        for (let i in this.sounds) {
-            //this.sounds[i].pos(this.position.x, this.position.y, 0);
-        }
     }
 
     collectPickup(type) {
@@ -120,7 +94,6 @@ export default class Ship extends DynamicObject {
                     this.maxHealth += 1;
                     this.health += 1;
                     this.upgradesBought[1]++;
-                    console.log("Newhealth", this.health)
                 }
                 break;
             case 2:
@@ -151,9 +124,9 @@ export default class Ship extends DynamicObject {
             renderer.skillBox.position.y += Math.random()*5;
 
             if (success) {
-                renderer.sounds.powerup.play();
+                renderer.playSound("powerup");
             } else {
-                renderer.sounds.deny.play();
+                renderer.playSound("deny");
             }
             renderer.updateSkills(this);
             renderer.updatePoints(this.points);
@@ -202,7 +175,6 @@ export default class Ship extends DynamicObject {
     }
 
     onAddToWorld(gameEngine) {
-        console.log("ship added to world", this.width, this.height)
         if (Renderer) {
             let renderer = Renderer.getInstance();
             renderer.playSound("spawn", this.position);
@@ -254,7 +226,7 @@ export default class Ship extends DynamicObject {
         if (Renderer) {
             let renderer = Renderer.getInstance();
             console.log("ship removed from scene");
-            renderer.sounds.shipDestroyed.play();
+            renderer.playSound("shipDestroyed")
             let sprite = renderer.sprites[this.id];
             sprite.shipSprite.destroy();
             this.shipText.destroy();
@@ -266,17 +238,12 @@ export default class Ship extends DynamicObject {
             this.spawnEmitter.destroy();
             this.gameEngine.timer.add(Math.round(this.explosionEmitter.maxLifetime*60), ()=>{
                 this.sprite.destroy()
-                for (let i in this.sounds) {
-                    this.sounds[i].unload();
-                }
             }, this)
 
             if (this == renderer.playerShip) {
                 if (renderer.announcement.text == '') renderer.announcement.text = 'press enter to respawn';
                 delete renderer.playerShip;
             }
-
-
         }
     }
 }

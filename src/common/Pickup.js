@@ -1,6 +1,5 @@
 import { BaseTypes, DynamicObject, Renderer, TwoVector } from 'lance-gg';
 import ExplosionEmitterConfig from '../client/ExplosionEmitter.js';
-import {Howl} from 'howler';
 import SpawnEmitterConfig from '../client/SpawnEmitter.js';
 let PixiParticles;
 export default class Pickup extends DynamicObject {
@@ -15,17 +14,6 @@ export default class Pickup extends DynamicObject {
 
         if (typeof window != "undefined") {
             PixiParticles = require('pixi-particles');
-
-            /*
-            this.sounds = {
-                destroy: new Howl({
-                    src: "assets/audio/pickupDestroyed.wav"
-                }),
-                spawn: new Howl({
-                    src: "assets/audio/spawn.wav"
-                }),
-            };
-            */
         }
     }
 
@@ -48,10 +36,6 @@ export default class Pickup extends DynamicObject {
 
     draw() {
         this.container.position.set(this.position.x+this.width/2, this.position.y+this.height/2);
-
-        for (let i in this.sounds) {
-            //this.sounds[i].pos(this.position.x, this.position.y, 0);
-        }
     }
 
 
@@ -104,7 +88,6 @@ export default class Pickup extends DynamicObject {
     }
 
     onRemoveFromWorld(gameEngine) {
-        console.log("picked up");
         if (Renderer) {
             let renderer = Renderer.getInstance();
             renderer.playSound("pickupDestroyed", this.position);

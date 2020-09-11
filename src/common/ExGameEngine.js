@@ -155,11 +155,8 @@ export default class ExGameEngine extends GameEngine {
                         this.renderer.playSound("smallCollide", obj.position);
                     }
                 }
-
             }
         }
-
-
 
         if (typeof testf == "function") testf(this) //debug
     }
@@ -252,7 +249,6 @@ export default class ExGameEngine extends GameEngine {
     }
 
     makeProjectile(playerShip, inputId) {
-        console.log("makeProjectile");
         let projectile = new Projectile(this);
         projectile.width = 1;
         projectile.height = 1;

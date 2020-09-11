@@ -8,28 +8,10 @@ export default class Barricade extends DynamicObject {
         this.health = 5;
         this.friction = new TwoVector(0.95, 0.95);
         this.height = 28; this.width = 28;
-        //this.velocity = new TwoVector(0.1,0.1);
 
         if (typeof window != "undefined") {
             PixiParticles = require('pixi-particles');
         }
-
-        /*
-        this.sounds = {
-            spawn: new Howl({
-                src: "assets/audio/spawn.wav"
-            }),
-            takeDamage: new Howl({
-                src: "assets/audio/takeDamage.wav"
-            }),
-            collide: new Howl({
-                src: "assets/audio/collide.wav"
-            }),
-            shipDestroyed: new Howl({
-                src: "assets/audio/shipDestroyed.wav"
-            }),
-        }
-        */
     }
 
     static get bending() {
@@ -54,10 +36,6 @@ export default class Barricade extends DynamicObject {
     draw() {
         this.container.position.set(this.position.x+this.width/2, this.position.y+this.height/2);
         this.sprite.angle = this.angle+90;
-
-        for (let i in this.sounds) {
-            //this.sounds[i].pos(this.position.x, this.position.y, 0);
-        }
     }
 
     takeDamage(damageType, amount) {
@@ -123,9 +101,6 @@ export default class Barricade extends DynamicObject {
             this.spawnEmitter.destroy();
             this.gameEngine.timer.add(Math.round(this.explosionEmitter.maxLifetime*60+60), ()=>{
                 this.container.destroy()
-                for (let i in this.sounds) {
-                    this.sounds[i].unload();
-                }
             }, this)
 
         }

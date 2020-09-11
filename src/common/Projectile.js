@@ -1,21 +1,9 @@
 import { BaseTypes, DynamicObject, Renderer } from 'lance-gg';
-import {Howl} from 'howler';
 export default class Projectile extends DynamicObject {
 
     constructor(gameEngine, options, props){
         super(gameEngine, options, props);
         this.damage = 1;
-
-        /*
-        this.sounds = {
-            collide: new Howl({
-                src: "assets/audio/smallCollide.wav"
-            }),
-            fireBullet: new Howl({
-                src: "assets/audio/fireBullet.wav"
-            }),
-        }
-        */
     }
 
     static get bending() {
@@ -31,18 +19,11 @@ export default class Projectile extends DynamicObject {
         }, super.netScheme)
     }
 
-    // position correction if less than world width/height
-
     draw() {
         this.sprite.position.set(this.position.x, this.position.y);
-
-        for (let i in this.sounds) {
-            //this.sounds[i].pos(this.position.x, this.position.y, 0);
-        }
     }
 
     onAddToWorld(gameEngine) {
-        console.log("projectile shot", this.width, this.height);
         if (Renderer) {
             let renderer = Renderer.getInstance();
             renderer.playSound("fireBullet", this.position);
@@ -61,10 +42,6 @@ export default class Projectile extends DynamicObject {
                 renderer.sprites[this.id].destroy();
                 delete renderer.sprites[this.id];
             }
-        }
-
-        for (let i in this.sounds) {
-            this.sounds[i].unload();
         }
     }
 
