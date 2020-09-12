@@ -166,9 +166,6 @@ export default class Ship extends DynamicObject {
             if (this == renderer.playerShip) {
                 renderer.playSound("playerHurt", this.position);
                 renderer.cameraShake = 4 + amount;
-                if (this.health <= 0) {
-                    renderer.announcement.text = "you died\npress enter to respawn";
-                }
             }
         }
         if (this.health <= 0 && !Renderer) {
@@ -243,6 +240,7 @@ export default class Ship extends DynamicObject {
             }, this)
 
             if (this == renderer.playerShip) {
+                renderer.announcement.text = "you died\npress enter to respawn";
                 if (renderer.announcement.text == '') renderer.announcement.text = 'press enter to respawn';
                 delete renderer.playerShip;
             }
