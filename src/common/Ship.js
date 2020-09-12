@@ -14,6 +14,7 @@ export default class Ship extends DynamicObject {
         this.damage = 1;
         this.maxShield = this.startingShield = 20;
         this.upgradesBought = [0, 0, 0, 0];
+        this.username = "";
 
         if (props) this.username = props.username || "";
         if (typeof window != "undefined") {
@@ -46,6 +47,7 @@ export default class Ship extends DynamicObject {
     syncTo(other) {
         super.syncTo(other);
 
+        this.username = other.username;
         this.health = other.health;
         this.maxHealth = other.maxHealth;
         this.fireRate = other.fireRate;

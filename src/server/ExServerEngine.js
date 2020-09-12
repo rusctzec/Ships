@@ -1,10 +1,10 @@
 import { ServerEngine } from 'lance-gg';
-import passport from '../config/passport';
 import Barricade from '../common/Barricade';
 import Ship from '../common/Ship';
 export default class ExServerEngine extends ServerEngine {
     constructor(io, gameEngine, inputOptions) {
         super(io, gameEngine, inputOptions);
+
         gameEngine.serverEngine = this;
         this.scoreData = {};
     }
@@ -40,7 +40,8 @@ export default class ExServerEngine extends ServerEngine {
         console.log("player connected")
         let makePlayerShip = () => {
             console.log("requestRestart: makePlayerShip")
-            let ship = this.gameEngine.makeShip(socket.playerId, "player "+socket.playerId);
+            let username = (socket.request.user && socket.request.user.username) || "player "+socket.playerId;
+            let ship = this.gameEngine.makeShip(socket.playerId, username);
 
             this.scoreData[ship.id] = {
                 kills: 0,
@@ -51,7 +52,8 @@ export default class ExServerEngine extends ServerEngine {
         socket.on('requestRestart', makePlayerShip);
 
         socket.on('chatMessage', (message) => {
-            this.io.sockets.emit('chatMessage', message.substring(0, 280), `player ${socket.playerId}`, socket.playerId);
+            let username = (socket.request.user && socket.request.user.username) || `player ${socket.playerId}`
+            this.io.sockets.emit('chatMessage', message.substring(0, 280), username, socket.playerId);
         });
     }
 

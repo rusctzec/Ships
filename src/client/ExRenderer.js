@@ -139,8 +139,6 @@ export default class ExRenderer extends Renderer {
             });
         }
 
-        //Howler.pos(0,0,0);
-
         return new Promise((resolve, reject) => {
 
             let borderWidth = 5;
@@ -274,7 +272,6 @@ export default class ExRenderer extends Renderer {
         if (this.playerShip) {
             this.playerPosition.set(this.playerShip.position.x, this.playerShip.position.y);
         }
-            //Howler.pos(this.playerShip.x+this.playerShip.width/2, this.playerShip.y+this.playerShip.height/2, 0);
 
             let cooldownBarLength = 60;
             if (this.playerShip.cooldown && this.gameEngine.timer.currentTime - this.playerShip.cooldown.startOffset < this.playerShip.cooldown.time) {
