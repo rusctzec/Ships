@@ -18,7 +18,7 @@ Ships is a real-time online multiplayer browser game, where players pilot minima
 
 ## Installation
 
-Ensure [MySQL Server](https://dev.mysql.com/downloads/mysql/) is installed and running.
+Ensure [PostgreSQL](https://www.postgresql.org/download/) is installed and running.
 
 
 
