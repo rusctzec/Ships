@@ -5,10 +5,10 @@
 ## Table of Contents
 
 - [Description](#description)
-- [Gameplay](#gameplay)
-- [Credits](#credits)
 - [Installation](#installation)
 - [Development](#development)
+- [Gameplay](#gameplay)
+- [Credits](#credits)
 - [Additional Information](#additional-information)
 
 
@@ -19,6 +19,19 @@ Ships is a real-time online multiplayer browser game, where players pilot minima
 [Visit deployed project here.](https://r-ships.herokuapp.com)
 
 [![Image that shows the project](https://raw.githubusercontent.com/rusctzec/ships/master/public/assets/images/demo.gif)](https://r-ships.herokuapp.com/)
+
+
+## Installation
+
+Ensure [PostgreSQL](https://www.postgresql.org/download/) is installed and running.
+
+Install dependencies with `npm i`
+
+## Development
+
+* Build with `npm run build`
+* Run built project with `npm run start`
+* Start live development server with `npm run dev`
 
 ## Gameplay
 
@@ -41,18 +54,6 @@ Current number of points and upgrade prices are shown above the cooldown bar.
 - Press <kbd>1</kbd> to upgrade player health
 - Press <kbd>2</kbd> to upgrade shield
 - Press <kbd>3</kbd> to upgrade projectile firing rate
-
-## Installation
-
-Ensure [PostgreSQL](https://www.postgresql.org/download/) is installed and running.
-
-Install dependencies with `npm i`
-
-## Development
-
-* Build with `npm run build`
-* Run built project with `npm run start`
-* Start live development server with `npm run dev`
 
 ## Credits
 
